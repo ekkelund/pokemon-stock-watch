@@ -8,6 +8,15 @@
     "de er irrelevante for indholdet og gør kun loggen støjende."
   ],
 
+  "_default_image": [
+    "Billede der vedhæftes notifikationer når varens eget billede ikke kan",
+    "findes på siden (fx ved listesiderne). Skal være en offentligt tilgængelig",
+    "URL. Upload billedet til assets/ i dette repo og brug raw-URL'en:",
+    "https://raw.githubusercontent.com/ekkelund/pokemon-stock-watch/main/assets/<filnavn>",
+    "Produktsider behøver den ikke: der hentes varens eget billede automatisk."
+  ],
+  "default_image": "",
+
   "products": [
     {
       "key": "etb30-br",

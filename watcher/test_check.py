@@ -13,7 +13,7 @@ import unittest
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from check import (  # noqa: E402
     IN_STOCK, OUT_OF_STOCK, UNKNOWN,
-    detect_status, find_products, slot_is_active, visible_text,
+    detect_image, detect_status, find_products, slot_is_active, visible_text,
 )
 from datetime import datetime  # noqa: E402
 
@@ -105,6 +105,25 @@ class TestStatus(unittest.TestCase):
     def test_scripts_excluded_from_visible_text(self):
         self.assertNotIn("udsolgt", visible_text(
             page('<script>var x = "Udsolgt";</script><p>På lager</p>')).lower())
+
+
+class TestImage(unittest.TestCase):
+    BASE = "https://www.bilka.dk/produkter/x/1/"
+
+    def test_prefers_ldjson_product_image(self):
+        html = page('''<script type="application/ld+json">{"@type":"Product","image":"https://cdn.example/vare.jpg"}</script><meta property="og:image" content="https://cdn.example/logo.png">''')
+        self.assertEqual(detect_image(html, self.BASE), "https://cdn.example/vare.jpg")
+
+    def test_falls_back_to_og_image(self):
+        html = page('<meta property="og:image" content="https://cdn.example/logo.png">')
+        self.assertEqual(detect_image(html, self.BASE), "https://cdn.example/logo.png")
+
+    def test_relative_url_is_made_absolute(self):
+        html = page('<meta property="og:image" content="/media/vare.jpg">')
+        self.assertEqual(detect_image(html, self.BASE), "https://www.bilka.dk/media/vare.jpg")
+
+    def test_none_when_no_image(self):
+        self.assertIsNone(detect_image(page("<p>ingen billeder</p>"), self.BASE))
 
 
 class TestListing(unittest.TestCase):

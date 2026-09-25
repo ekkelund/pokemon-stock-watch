@@ -46,6 +46,20 @@ natten koster ingenting, fordi Actions-minutter er gratis på offentlige repos.
 Valgfrit: `NTFY_SERVER` som repository *variable* hvis du kører selvhostet ntfy,
 og `NTFY_TOKEN` som secret hvis serveren kræver adgangstoken.
 
+## Billede i notifikationen
+
+Notifikationer vedhæfter et billede, så du kan se hvad der er kommet ind uden
+at åbne linket. Billedet vælges i denne rækkefølge:
+
+1. `image` sat direkte på målet i `targets.json`
+2. varens eget billede aflæst fra siden (schema.org `image`, ellers `og:image`)
+3. `default_image` fra `targets.json`
+
+Punkt 2 gør at produktnotifikationer får det rigtige billede helt af sig selv.
+`default_image` er kun til listesiderne, hvor der ikke hentes en produktside.
+Den skal være en offentligt tilgængelig URL; upload billedet til `assets/` i
+dette repo og peg på raw-URL'en.
+
 ## Om pålideligheden
 
 Sallings sider er Next.js-drevne, og deres interne datastruktur er hverken

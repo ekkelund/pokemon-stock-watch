@@ -23,6 +23,7 @@ import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 import zlib
 from datetime import datetime, timedelta, timezone
@@ -168,6 +169,28 @@ def walk_json(node, path=""):
                 yield from walk_json(value, child)
             else:
                 yield child, "", value
+
+
+OG_IMAGE_RE = re.compile(
+    r'<meta\b[^>]*(?:property|name)=["\']og:image["\'][^>]*content=["\']([^"\']+)["\']',
+    re.IGNORECASE,
+)
+
+
+def detect_image(html: str, base_url: str):
+    """Find produktets billede, så notifikationen viser den faktiske vare.
+
+    JSON-LD foretrækkes: "image" på et Product er varen selv, mens og:image
+    på en listeside lige så godt kan være butikkens logo.
+    """
+    for entry in parse_ld_json(html):
+        for _path, key, value in walk_json(entry):
+            if key.lower() == "image" and isinstance(value, str) and value.strip():
+                return urllib.parse.urljoin(base_url, value.strip())
+    match = OG_IMAGE_RE.search(html)
+    if match:
+        return urllib.parse.urljoin(base_url, match.group(1).strip())
+    return None
 
 
 def visible_text(html: str) -> str:
@@ -386,7 +409,8 @@ def _nearby_id(root, path: str):
 # --------------------------------------------------------------------------
 
 def notify(title: str, message: str, *, priority: int = 5, tags=None,
-           click: str | None = None, dry_run: bool = False) -> None:
+           click: str | None = None, image: str | None = None,
+           dry_run: bool = False) -> None:
     topic = os.environ.get("NTFY_TOPIC", "").strip()
     server = os.environ.get("NTFY_SERVER", "https://ntfy.sh").strip().rstrip("/")
     token = os.environ.get("NTFY_TOKEN", "").strip()
@@ -394,6 +418,8 @@ def notify(title: str, message: str, *, priority: int = 5, tags=None,
     if dry_run or not topic:
         why = "dry-run" if dry_run else "NTFY_TOPIC ikke sat"
         print(f"  [ntfy/{why}] {title} :: {message}")
+        if image:
+            print(f"  [ntfy/{why}] billede: {image}")
         return
 
     # JSON-publicering frem for headers: ntfy-headers skal være ASCII, og
@@ -407,6 +433,10 @@ def notify(title: str, message: str, *, priority: int = 5, tags=None,
     }
     if click:
         payload["click"] = click
+    if image:
+        # icon giver det lille ikon, attach den store forhåndsvisning.
+        payload["icon"] = image
+        payload["attach"] = image
 
     headers = {"Content-Type": "application/json"}
     if token:
@@ -461,7 +491,8 @@ def should_send_diagnostic(entry: dict, now: datetime) -> bool:
 # Tjek
 # --------------------------------------------------------------------------
 
-def check_product(target: dict, state: dict, now: datetime, dry_run: bool) -> None:
+def check_product(target: dict, state: dict, now: datetime, dry_run: bool,
+                  fallback_image: str | None = None) -> None:
     key, name, url = target["key"], target["name"], target["url"]
     entry = state.setdefault(key, {})
     print(f"[produkt] {name}")
@@ -479,6 +510,7 @@ def check_product(target: dict, state: dict, now: datetime, dry_run: bool) -> No
             )
         return
 
+    image = target.get("image") or detect_image(html, url) or fallback_image
     status, method, evidence = detect_status(html)
     previous = entry.get("status", UNKNOWN)
     entry["status"] = status
@@ -505,13 +537,15 @@ def check_product(target: dict, state: dict, now: datetime, dry_run: bool) -> No
         notify(
             f"PÅ LAGER: {name}",
             f"Varen er netop blevet tilgængelig.{confidence}\n\n{url}",
-            priority=5, tags=["package", "tada"], click=url, dry_run=dry_run,
+            priority=5, tags=["package", "tada"], click=url, image=image,
+            dry_run=dry_run,
         )
     elif status == OUT_OF_STOCK and previous == IN_STOCK:
         print("  gik fra på lager til udsolgt (ingen notifikation)")
 
 
-def check_listing(target: dict, state: dict, now: datetime, dry_run: bool) -> None:
+def check_listing(target: dict, state: dict, now: datetime, dry_run: bool,
+                  fallback_image: str | None = None) -> None:
     key, name, url = target["key"], target["name"], target["url"]
     pattern = re.compile(target.get("match", "booster.{0,15}bundle"), re.IGNORECASE)
     entry = state.setdefault(key, {})
@@ -558,7 +592,8 @@ def check_listing(target: dict, state: dict, now: datetime, dry_run: bool) -> No
             notify(
                 f"BOOSTER BUNDLE: {product['name']}",
                 f"Nyt produkt dukket op på {name}.\n\n{url}",
-                priority=5, tags=["package", "tada"], click=url, dry_run=dry_run,
+                priority=5, tags=["package", "tada"], click=url,
+                image=target.get("image") or fallback_image, dry_run=dry_run,
             )
             print(f"  NY: {product['id']} {product['name']}")
         else:
@@ -599,6 +634,7 @@ def main() -> int:
             return 1
         print(f"hentet {len(html)} tegn")
         print("lagerstatus:", detect_status(html))
+        print("billede:", detect_image(html, args.probe))
         links = sorted(set(PRODUCT_HREF_RE.findall(html)))
         print(f"produktlinks: {len(links)}")
         for slug, product_id in links[:40]:
@@ -614,16 +650,18 @@ def main() -> int:
     state = load_state()
     print(f"Tjek kl. {now:%Y-%m-%d %H:%M %Z}\n")
 
+    fallback_image = targets.get("default_image") or None
+
     for target in targets.get("products", []):
         try:
-            check_product(target, state, now, args.dry_run)
+            check_product(target, state, now, args.dry_run, fallback_image)
         except Exception as exc:  # ét dødt mål må ikke stoppe resten
             print(f"  uventet fejl: {type(exc).__name__}: {exc}", file=sys.stderr)
         print()
 
     for target in targets.get("listings", []):
         try:
-            check_listing(target, state, now, args.dry_run)
+            check_listing(target, state, now, args.dry_run, fallback_image)
         except Exception as exc:
             print(f"  uventet fejl: {type(exc).__name__}: {exc}", file=sys.stderr)
         print()
