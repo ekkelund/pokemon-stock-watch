@@ -619,13 +619,39 @@ def main() -> int:
     if args.test_notify:
         # Bevis at hele vejen til telefonen virker. Uden den kan en forkert
         # secret først vise sig den dag varen rent faktisk kommer på lager.
+        #
+        # Billedet hentes fra en rigtig produktside frem for at være hardkodet,
+        # så testen dækker hele kæden: hentning, aflæsning af schema.org-data,
+        # billedudtræk og vedhæftning. Et fast billede ville kun bevise det
+        # sidste led.
+        targets = json.loads(TARGETS_PATH.read_text(encoding="utf-8"))
+        image = targets.get("default_image") or None
+        source = "standardbillede fra targets.json" if image else "intet"
+        link = "https://github.com/ekkelund/pokemon-stock-watch/actions"
+
+        products = targets.get("products") or []
+        if products:
+            first = products[0]
+            html, error = http_get(first["url"])
+            if html is None:
+                print(f"  kunne ikke hente {first['name']}: {error}")
+            else:
+                found = detect_image(html, first["url"])
+                if found:
+                    image, source, link = found, first["name"], first["url"]
+                else:
+                    print(f"  intet billede fundet på {first['name']}")
+
+        print(f"  billedkilde: {source}")
+        print(f"  billede: {image}")
         notify(
             "Test fra lagerovervågningen",
-            "Virker denne besked, når de rigtige også frem. "
-            "Ingen varer er kommet på lager; dette er kun en test.",
-            priority=3, tags=["white_check_mark"],
-            click="https://github.com/ekkelund/pokemon-stock-watch/actions",
-            dry_run=args.dry_run,
+            f"Virker denne besked, når de rigtige også frem.\n\n"
+            f"Billedet er hentet live fra produktsiden ({source}), "
+            f"så det er sådan en rigtig notifikation kommer til at se ud.\n\n"
+            f"Ingen varer er kommet på lager; dette er kun en test.",
+            priority=3, tags=["white_check_mark"], click=link,
+            image=image, dry_run=args.dry_run,
         )
         return 0
 
