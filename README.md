@@ -4,6 +4,8 @@ Tjekker bilka.dk, foetex.dk og br.dk og sender en ntfy-notifikation når
 noget bliver tilgængeligt. Kører som GitHub Actions-cron, så der skal ikke
 stå en maskine tændt derhjemme.
 
+> Leder du efter forklaringen uden teknik? Se **[TIL-THEO.md](TIL-THEO.md)**.
+
 ## Hvad der overvåges
 
 **Elite Trainer Box 30th** (vare 200392202) på alle tre sider. Notifikation
