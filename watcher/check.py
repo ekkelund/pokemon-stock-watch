@@ -653,6 +653,10 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
     """
     key, name = target["key"], target["name"]
     pattern = re.compile(target["match"], re.IGNORECASE)
+    # Tilbehør bærer varens navn: en akrylkasse til en booster box hedder
+    # "booster box" i slug'en. Uden frasortering ville hver opbevaringsæske
+    # udløse alarm, og falske alarmer lærer en at ignorere de ægte.
+    exclude = re.compile(target["exclude"], re.IGNORECASE) if target.get("exclude") else None
     entry = state.setdefault(key, {})
     known = entry.setdefault("known_urls", {})
     print(f"[opdagelse] {name}")
@@ -683,9 +687,17 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
                 )
             continue
         total += len(urls)
-        matches = [u for u in urls
-                   if pattern.search(product_slug(u).replace("-", " "))]
-        print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher")
+        matches, filtered = [], 0
+        for url in urls:
+            label = product_slug(url).replace("-", " ")
+            if not pattern.search(label):
+                continue
+            if exclude and exclude.search(label):
+                filtered += 1
+                continue
+            matches.append(url)
+        note = f", {filtered} frasorteret som tilbehør" if filtered else ""
+        print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher{note}")
 
         for url in matches:
             if url in known:

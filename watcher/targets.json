@@ -51,8 +51,18 @@
   "discovery": [
     {
       "key": "booster-bundle",
-      "name": "Booster Bundle",
-      "match": "booster.{0,15}bundle",
+      "name": "Pokemon booster",
+      "_om_match": [
+        "Maalt mod alle fem kataloger 2026-09-25 foer den blev sat i drift.",
+        "Fanger: alle Pokemon-boostere, samt bundles og bokse fra ethvert maerke.",
+        "Fanger ikke: booster-varer fra andre maerker uden bundle eller box, fordi",
+        "  br og foetex har snesevis af Panini- og Topps-boostere der ellers ville",
+        "  larme; og hudpleje og haarserum, som salling.dk har hundredvis af.",
+        "exclude fjerner tilbehoer: en akrylkasse TIL en booster box hedder selv",
+        "  booster box i slug'en og ville ellers udloese alarm."
+      ],
+      "match": "pokemon.*booster|booster.{0,15}(bundle|box)",
+      "exclude": "akrylkasse|binder|sleeve|etui|opbevaring|toploader|kasse til|holder",
       "sites": [
         "https://www.bilka.dk",
         "https://www.br.dk",

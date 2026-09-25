@@ -258,6 +258,65 @@ class TestUrlShapes(unittest.TestCase):
             pattern.search(product_slug(self.BILKA).replace("-", " ")))
 
 
+class TestWidenedPattern(unittest.TestCase):
+    """Det udvidede mønster mod rigtige slugs fra katalogerne.
+
+    Alle strengene herunder er faktiske produkter målt 25. september 2026.
+    Prisen for at løsne mønsteret er falske træf, og falske træf lærer en at
+    ignorere notifikationerne.
+    """
+
+    MATCH = re.compile(r"pokemon.*booster|booster.{0,15}(bundle|box)", re.IGNORECASE)
+    EXCLUDE = re.compile(
+        r"akrylkasse|binder|sleeve|etui|opbevaring|toploader|kasse til|holder",
+        re.IGNORECASE)
+
+    def hit(self, slug):
+        label = slug.replace("-", " ")
+        return bool(self.MATCH.search(label)) and not self.EXCLUDE.search(label)
+
+    def test_wanted(self):
+        for slug in [
+            "pokemon-booster-bundle-mega-evolution",
+            "pokemon-pitch-black-checklane-booster-pack",
+            "pokemon-scarlet-violet-booster-box",
+            "pokemon-elite-trainer-booster-bundle",
+        ]:
+            self.assertTrue(self.hit(slug), slug)
+
+    def test_other_brands_trading_cards_are_ignored(self):
+        # Rigtige varer hos br.dk og foetex.dk. De er boostere, men ikke Pokemon,
+        # og ikke bundles eller bokse.
+        for slug in [
+            "topps-match-attax-champions-league-booster-tin-fodboldkort-assorteret",
+            "panini-italian-brainrot-2-tgc-booster-samlekort-flere-varianter-assorteret",
+            "panini-hot-wheel-samlekort-booster-pakke",
+            "vm-booster-flowpack-samlekort",
+        ]:
+            self.assertFalse(self.hit(slug), slug)
+
+    def test_accessories_are_excluded(self):
+        # Rigtig vare hos br.dk: en akrylkasse TIL en booster box. Uden
+        # frasortering ville den matche på "booster box".
+        self.assertTrue(self.MATCH.search("shieldbinder akrylkasse til booster box"))
+        self.assertFalse(self.hit("shieldbinder-akrylkasse-til-booster-box"))
+
+    def test_beauty_and_baby_products_are_ignored(self):
+        # Rigtige varer hos salling.dk og foetex.dk.
+        for slug in [
+            "pure-volume-booster-masque-50-ml",
+            "super3-booster-anti-age-creme-50-ml",
+            "the-6-peptide-skin-booster-serum-150-ml",
+            "curl-booster-anti-frizz-haarspray-kroellet-haar",
+            "titaniumbaby-boosterseat-finn-125-150-cm",
+        ]:
+            self.assertFalse(self.hit(slug), slug)
+
+    def test_pokemon_clothing_does_not_match(self):
+        # salling.dk sælger Pokemon-toej. Uden "booster" i navnet matcher det ikke.
+        self.assertFalse(self.hit("mile-pokemon-t-shirt-bright-white-116-cm"))
+
+
 class TestSchedule(unittest.TestCase):
     def test_daytime_both_slots(self):
         self.assertTrue(slot_is_active(datetime(2026, 9, 25, 9, 0)))

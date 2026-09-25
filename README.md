@@ -10,9 +10,28 @@ stå en maskine tændt derhjemme.
 når varen skifter fra utilgængelig til på lager. Alle tre sider tjekkes, fordi
 Salling ikke nødvendigvis frigiver lager samtidig på dem.
 
-**Booster bundles** opdages via sitemap. Notifikation når en vare hvis URL
-matcher `booster.{0,15}bundle` dukker op i kataloget, og varen lægges derefter
-automatisk i lagerovervågning, så du også får besked når den kan købes.
+**Pokémon-boostere** opdages via sitemap. Notifikation når en ny vare dukker op
+i kataloget, og varen lægges derefter automatisk i lagerovervågning, så du også
+får besked når den kan købes.
+
+Mønsteret er `pokemon.*booster|booster.{0,15}(bundle|box)` med frasortering af
+`akrylkasse|binder|sleeve|etui|opbevaring|toploader|kasse til|holder`. Det blev
+målt mod alle fem kataloger inden det blev sat i drift, fordi et for bredt
+mønster koster mere end det smager: falske alarmer lærer en at ignorere
+notifikationerne, og så tier overvågningen den dag den har ret.
+
+Hvad målingen viste:
+
+| Vare | Resultat |
+|---|---|
+| `pokemon-pitch-black-checklane-booster-pack` | fanget |
+| `shieldbinder-akrylkasse-til-booster-box` | frasorteret som tilbehør |
+| `topps-match-attax-champions-league-booster-tin` | ignoreret, andet mærke |
+| `panini-hot-wheel-samlekort-booster-pakke` | ignoreret, andet mærke |
+| `the-6-peptide-skin-booster-serum-150-ml` | ignoreret, hudpleje |
+| `titaniumbaby-boosterseat-finn-125-150-cm` | ignoreret, autostol |
+
+salling.dk's 129.010 varer gav nul falske træf.
 
 Mål redigeres i `watcher/targets.json`.
 
