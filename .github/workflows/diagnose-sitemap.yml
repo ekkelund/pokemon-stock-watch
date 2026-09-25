@@ -3,8 +3,8 @@ name: Diagnose Sitemap
 on:
   workflow_dispatch:
     inputs:
-      sites:
-        description: 'Sites adskilt af mellemrum (tom = de overvågede)'
+      args:
+        description: 'Fx: --match "<regex>" --exclude "<regex>" [sites]'
         type: string
         default: ''
 
@@ -14,4 +14,4 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: python3 watcher/diagnose_sitemap.py ${{ inputs.sites }}
+      - run: python3 watcher/diagnose_sitemap.py ${{ inputs.args }}

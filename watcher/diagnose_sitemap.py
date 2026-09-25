@@ -20,7 +20,16 @@ LOC_RE = re.compile(r"<loc>([^<]+)</loc>")
 KNOWN_PRODUCT_ID = "200392202"
 
 
-for base in (sys.argv[1:] or DEFAULT_SITES):
+# Et foreslået mønster kan prøves af mod de rigtige kataloger inden det sættes
+# i drift. Falske træf er dyre: de lærer en at ignorere notifikationerne.
+args = sys.argv[1:]
+try_match = try_exclude = None
+if "--match" in args:
+    i = args.index("--match"); try_match = args[i + 1]; del args[i:i + 2]
+if "--exclude" in args:
+    i = args.index("--exclude"); try_exclude = args[i + 1]; del args[i:i + 2]
+
+for base in (args or DEFAULT_SITES):
     print("=" * 78)
     print(base)
     print("=" * 78)
@@ -94,12 +103,33 @@ for base in (sys.argv[1:] or DEFAULT_SITES):
     for k in known[:2]:
         print(f"      {k}")
 
-    for label, pattern in [("pokemon", r"pokemon"),
-                           ("booster", r"booster"),
-                           ("booster bundle", r"booster.{0,15}bundle"),
-                           ("elite trainer", r"elite.{0,10}trainer")]:
-        hits = [l for l in all_products if re.search(pattern, l, re.IGNORECASE)]
-        print(f"  {label}: {len(hits)}")
-        for h in hits[:4]:
-            print(f"      {h}")
+    if try_match:
+        # Der matches på slug'en alene, præcis som overvågningen gør.
+        def slug(url):
+            parts = [p for p in url.split("/")[3:] if p]
+            if len(parts) > 1 and re.match(r"^(?:p-)?\d{4,}$", parts[-1]):
+                return parts[-2]
+            return parts[-1] if parts else ""
+
+        hits = [u for u in all_products
+                if re.search(try_match, slug(u).replace("-", " "), re.IGNORECASE)]
+        kept, dropped = [], []
+        for u in hits:
+            target = dropped if (try_exclude and re.search(
+                try_exclude, slug(u).replace("-", " "), re.IGNORECASE)) else kept
+            target.append(u)
+        print(f"  MØNSTER {try_match!r}: {len(hits)} træf")
+        for u in kept:
+            print(f"      BEHOLDT  {slug(u)}")
+        for u in dropped:
+            print(f"      FRASORT. {slug(u)}")
+    else:
+        for label, pattern in [("pokemon", r"pokemon"),
+                               ("booster", r"booster"),
+                               ("booster bundle", r"booster.{0,15}bundle"),
+                               ("elite trainer", r"elite.{0,10}trainer")]:
+            hits = [l for l in all_products if re.search(pattern, l, re.IGNORECASE)]
+            print(f"  {label}: {len(hits)}")
+            for h in hits[:4]:
+                print(f"      {h}")
     print()
