@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import hashlib
 import json
 import os
 import re
@@ -349,6 +350,15 @@ PRODUCT_HREF_RE = re.compile(r'/produkter/([a-z0-9\-]+)/(\d+)/?', re.IGNORECASE)
 # ntfy
 # --------------------------------------------------------------------------
 
+def topic_fingerprint(topic: str) -> str:
+    """Kort hash af topicet, så en forkert secret kan opdages i loggen.
+
+    Selve topicet må ikke stå i loggen: repoet er offentligt, og alle der
+    kender navnet kan både læse og sende til det.
+    """
+    return hashlib.sha256(topic.encode()).hexdigest()[:10]
+
+
 def notify(title: str, message: str, *, priority: int = 5, tags=None,
            click: str | None = None, image: str | None = None,
            dry_run: bool = False) -> None:
@@ -391,6 +401,8 @@ def notify(title: str, message: str, *, priority: int = 5, tags=None,
         with urllib.request.urlopen(req, timeout=20) as resp:
             resp.read()
         print(f"  [ntfy] sendt: {title}")
+        print(f"  [ntfy] topic-fingeraftryk: {topic_fingerprint(topic)} "
+              f"(længde {len(topic)}), server {server}")
     except Exception as exc:
         # En fejlet notifikation må aldrig vælte kørslen: så ville vi også miste
         # de øvrige mål og den state-opdatering der forhindrer gentagne beskeder.
