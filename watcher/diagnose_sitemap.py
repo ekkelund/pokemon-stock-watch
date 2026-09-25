@@ -32,29 +32,61 @@ for base in (sys.argv[1:] or DEFAULT_SITES):
         disallows = re.findall(r"(?im)^\s*Disallow:\s*(\S+)", robots)
         print(f"robots.txt: {len(disallows)} Disallow, sitemap-henvisninger: {sitemaps}")
 
-    index, err = http_get(f"{base}/sitemap/sitemap-index.xml")
+    # Følg robots.txt' egen henvisning frem for en fast sti: koncernens sider
+    # ligger ikke alle på samme platform, og robots.txt er standardmåden at
+    # finde et sitemap på.
+    candidates = sitemaps if robots else []
+    candidates.append(f"{base}/sitemap/sitemap-index.xml")
+    candidates.append(f"{base}/sitemap.xml")
+
+    index = None
+    for candidate in candidates:
+        index, err = http_get(candidate)
+        if index is not None:
+            print(f"sitemap fundet: {candidate}")
+            break
+        print(f"  {candidate}: {err}")
     if index is None:
-        print(f"sitemap-index: FEJL {err}\n")
+        print()
         continue
     children = LOC_RE.findall(index)
+    # Et sitemap-index peger på andre sitemaps; et almindeligt sitemap peger
+    # direkte på sider. Kender vi ikke typen, behandler vi det som et index
+    # hvis alle henvisninger selv ser ud som sitemaps.
+    if "<sitemapindex" not in index[:400].lower():
+        children = [candidate] if not children else children
+        if "<urlset" in index[:400].lower():
+            children = [candidate]
     print(f"sitemap-index: {len(index)} tegn, {len(children)} undersitemaps")
     for child in children[:25]:
         print(f"    {child}")
 
     # Gennemgå ALLE undersitemaps: produkterne ligger ikke nødvendigvis i det
     # første, og det er netop produkt-URLerne der skal kunne opdages.
-    all_products = []
-    for child in children:
+    all_urls = []
+    for child in children[:12]:
         body, err = http_get(child)
         if body is None:
             print(f"  {child}: FEJL {err}")
             continue
         locs = LOC_RE.findall(body)
-        products = [l for l in locs if "/produkter/" in l]
-        all_products.extend(products)
-        print(f"  {child.rsplit('/', 1)[1]}: {len(locs)} URLer, heraf {len(products)} produkter")
-        if products:
-            print(f"    eksempel: {products[0]}")
+        all_urls.extend(locs)
+        print(f"  {child.rsplit('/', 1)[1]}: {len(locs)} URLer")
+
+    # Hvilke stier findes overhovedet? Et ukendt site bruger ikke nødvendigvis
+    # /produkter/, så segmenterne tælles frem for at blive antaget.
+    from collections import Counter
+    segments = Counter()
+    for url in all_urls:
+        parts = [p for p in url.split("/")[3:] if p]
+        segments[parts[0] if parts else "(rod)"] += 1
+    print(f"\n  hyppigste førstesegment: {segments.most_common(12)}")
+
+    all_products = [l for l in all_urls if "/produkter/" in l or "/produkt/" in l]
+    print(f"  URLer med /produkter/ eller /produkt/: {len(all_products)}")
+    if not all_products:
+        all_products = all_urls
+        print("  (ingen produktsti genkendt, søger i alle URLer)")
 
     print(f"\n  produkter i alt: {len(all_products)}")
     known = [l for l in all_products if KNOWN_PRODUCT_ID in l]
