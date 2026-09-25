@@ -667,7 +667,7 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
     # udløse alarm, og falske alarmer lærer en at ignorere de ægte.
     exclude = re.compile(target["exclude"], re.IGNORECASE) if target.get("exclude") else None
     entry = state.setdefault(key, {})
-    known = entry.setdefault("known_urls", {})
+    known = entry.setdefault("known_products", {})
     print(f"[opdagelse] {name}")
 
     last = entry.get("last_run")
@@ -686,7 +686,12 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
     # 30th-mønsteret. Uden dette ville den blive opdaget som ny og derefter
     # tjekket to gange, med dobbelte notifikationer den dag den lander.
     configured = already_watched or set()
-    total = 0
+
+    # Samme vare ligger på alle tre sider med samme vare-id. Der grupperes
+    # derfor pr. vare frem for pr. URL: ellers ville hver lancering give tre
+    # ens notifikationer. Lagerovervågningen sker stadig pr. butik, for en
+    # vare kan sagtens være på lager det ene sted og udsolgt det andet.
+    by_product, total = {}, 0
     for site in target["sites"]:
         urls, error = sitemap_product_urls(site)
         if urls is None:
@@ -700,38 +705,38 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
                 )
             continue
         total += len(urls)
-        matches, filtered = [], 0
-        for url in urls:
-            label = product_slug(url).replace("-", " ")
-            if not pattern.search(label):
-                continue
-            if exclude and exclude.search(label):
-                filtered += 1
-                continue
-            matches.append(url)
-        note = f", {filtered} frasorteret som tilbehør" if filtered else ""
-        print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher{note}")
-
+        matches = [u for u in urls
+                   if pattern.search(product_slug(u).replace("-", " "))
+                   and u not in configured]
+        print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher")
         for url in matches:
-            if url in known or url in configured:
-                continue
-            label = pretty_name(product_slug(url)) or url
-            known[url] = {"first_seen": now.isoformat(), "name": label}
-            # Læg varen i lagerovervågning, så vi også fanger at den kommer
-            # på lager, ikke kun at den er oprettet.
-            watched[url] = {"name": label, "url": url}
-            print(f"  NY: {label}")
-            notify(
-                f"{name.upper()} FUNDET: {label}",
-                f"Ny vare i katalog: {label}.\n\nDen er nu også lagerovervåget."
-                f"\n\n{url}",
-                priority=5, tags=["package", "tada"], click=url,
-                image=target.get("image") or fallback_image, dry_run=dry_run,
-            )
+            product_id = url_segments(url)[-1]
+            by_product.setdefault(product_id, []).append(url)
+
+    for product_id, urls in sorted(by_product.items()):
+        for url in urls:
+            watched.setdefault(url, {"name": pretty_name(product_slug(url)),
+                                     "url": url})
+        if product_id in known:
+            continue
+        label = pretty_name(product_slug(urls[0])) or product_id
+        shops = ", ".join(sorted(
+            urllib.parse.urlparse(u).netloc.replace("www.", "") for u in urls))
+        known[product_id] = {"first_seen": now.isoformat(), "name": label,
+                             "urls": sorted(urls)}
+        print(f"  NY: {label} ({shops})")
+        notify(
+            f"{name.upper()} FUNDET: {label}",
+            f"Ny vare i katalog hos {shops}.\n\n"
+            f"Den er nu også lagerovervåget, så du får besked når den kan "
+            f"købes.\n\n" + "\n".join(sorted(urls)),
+            priority=5, tags=["package", "tada"], click=urls[0],
+            image=target.get("image") or fallback_image, dry_run=dry_run,
+        )
 
     entry["last_run"] = now.isoformat()
     entry["products_scanned"] = total
-    print(f"  {len(known)} kendte match, {total} produkter gennemgået")
+    print(f"  {len(known)} kendte varer, {total} produkter gennemgået")
 
 
 # --------------------------------------------------------------------------
