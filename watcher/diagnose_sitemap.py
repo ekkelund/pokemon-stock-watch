@@ -29,24 +29,28 @@ for base in SITES:
     for child in children[:25]:
         print(f"    {child}")
 
-    # Kig i det første der ser ud til at rumme produkter.
-    product_maps = [c for c in children if "produkt" in c.lower() or "product" in c.lower()]
-    target = product_maps[0] if product_maps else (children[0] if children else None)
-    if not target:
-        print()
-        continue
+    # Gennemgå ALLE undersitemaps: produkterne ligger ikke nødvendigvis i det
+    # første, og det er netop produkt-URLerne der skal kunne opdages.
+    all_products = []
+    for child in children:
+        body, err = http_get(child)
+        if body is None:
+            print(f"  {child}: FEJL {err}")
+            continue
+        locs = LOC_RE.findall(body)
+        products = [l for l in locs if "/produkter/" in l]
+        all_products.extend(products)
+        print(f"  {child.rsplit('/', 1)[1]}: {len(locs)} URLer, heraf {len(products)} produkter")
+        if products:
+            print(f"    eksempel: {products[0]}")
 
-    print(f"\n  henter: {target}")
-    body, err = http_get(target)
-    if body is None:
-        print(f"  FEJL {err}\n")
-        continue
-    locs = LOC_RE.findall(body)
-    print(f"  {len(body)} tegn, {len(locs)} URLer")
-    for loc in locs[:5]:
-        print(f"    {loc}")
-    bundles = [l for l in locs if re.search(r"booster.{0,15}bundle", l, re.IGNORECASE)]
-    print(f"  heraf booster bundle: {len(bundles)}")
-    for b in bundles[:10]:
-        print(f"    {b}")
+    print(f"\n  produkter i alt: {len(all_products)}")
+    for label, pattern in [("pokemon", r"pokemon"),
+                           ("booster", r"booster"),
+                           ("booster bundle", r"booster.{0,15}bundle"),
+                           ("elite trainer", r"elite.{0,10}trainer")]:
+        hits = [l for l in all_products if re.search(pattern, l, re.IGNORECASE)]
+        print(f"  {label}: {len(hits)}")
+        for h in hits[:4]:
+            print(f"      {h}")
     print()
