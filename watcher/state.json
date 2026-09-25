@@ -1,1 +1,58 @@
-{}
+{
+  "_heartbeat": "2026-09-25",
+  "booster-bundle": {
+    "known_urls": {
+      "https://www.bilka.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/": {
+        "first_seen": "2026-09-25T21:43:57.033430+02:00",
+        "name": "pokemon pitch black checklane booster pack"
+      },
+      "https://www.bilka.dk/produkter/pokemon-tcg-booster-pack-samlekort/200366277/": {
+        "first_seen": "2026-09-25T21:43:57.033430+02:00",
+        "name": "pokemon tcg booster pack samlekort"
+      },
+      "https://www.br.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/": {
+        "first_seen": "2026-09-25T21:43:57.033430+02:00",
+        "name": "pokemon pitch black checklane booster pack"
+      },
+      "https://www.foetex.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/": {
+        "first_seen": "2026-09-25T21:43:57.033430+02:00",
+        "name": "pokemon pitch black checklane booster pack"
+      }
+    },
+    "last_run": "2026-09-25T21:43:57.033430+02:00",
+    "products_scanned": 241956
+  },
+  "etb30-bilka": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.bilka.dk/produkter/pokemon-elite-trainer-box-30th-samlekort/200392202/"
+  },
+  "etb30-br": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.br.dk/produkter/pokemon-elite-trainer-box-30th-samlekort/200392202/"
+  },
+  "etb30-foetex": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.foetex.dk/produkter/pokemon-elite-trainer-box-30th-samlekort/200392202/"
+  },
+  "watched_products": {
+    "https://www.bilka.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/": {
+      "name": "Pokemon Pitch Black Checklane Booster Pack",
+      "url": "https://www.bilka.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/"
+    },
+    "https://www.bilka.dk/produkter/pokemon-tcg-booster-pack-samlekort/200366277/": {
+      "name": "Pokemon Tcg Booster Pack Samlekort",
+      "url": "https://www.bilka.dk/produkter/pokemon-tcg-booster-pack-samlekort/200366277/"
+    },
+    "https://www.br.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/": {
+      "name": "Pokemon Pitch Black Checklane Booster Pack",
+      "url": "https://www.br.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/"
+    },
+    "https://www.foetex.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/": {
+      "name": "Pokemon Pitch Black Checklane Booster Pack",
+      "url": "https://www.foetex.dk/produkter/pokemon-pitch-black-checklane-booster-pack/200380911/"
+    }
+  }
+}
