@@ -147,6 +147,20 @@ gætte. Det er kedeligt at få, men meget bedre end stilhed.
 
 Det sidste er fordi GitHub lader computere køre gratis for åbne projekter.
 
+## Den stopper af sig selv
+
+Robotten slukker den **1. december**. Sidste dag den leder er 30. november.
+
+Datoen står i koden, så vi ikke skal huske det. Den dag sender den én sidste
+besked om at nu er det slut, og så tier den.
+
+Hvorfor sende den besked? Fordi hvis den bare holdt op med at sige noget,
+ville vi ikke kunne se forskel på "den er stoppet som aftalt" og "den er gået
+i stykker". Og det er en rigtig dårlig måde at finde ud af at man ikke
+længere får besked om noget man venter på.
+
+Skal den køre videre, retter vi bare datoen.
+
 ## Vil du ændre noget?
 
 Alt der styrer jagten står i filen `watcher/targets.json`. Der kan man:

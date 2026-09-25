@@ -7,6 +7,15 @@
   ],
   "default_image": "",
 
+  "_om_slutdato": [
+    "Foerste dag UDEN overvaagning. 2026-12-01 betyder at 30. november er",
+    "sidste dag der tjekkes. Paa dagen sendes en enkelt afskedsbesked, saa",
+    "det ikke sker i stilhed: en overvaagning der bare holder op med at sige",
+    "noget, ser praecis ud som en der er gaaet i stykker.",
+    "Ryd feltet eller saet en senere dato for at fortsaette."
+  ],
+  "watch_until": "2026-12-01",
+
   "_om_produkter": [
     "Konkrete varer der følges hver kørsel. Lagerstatus aflæses fra sidens",
     "schema.org JSON-LD, som alle tre sider leverer korrekt."

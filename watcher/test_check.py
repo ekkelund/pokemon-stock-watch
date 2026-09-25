@@ -361,6 +361,30 @@ class TestShopName(unittest.TestCase):
             self.assertEqual(shop_name(url), expected)
 
 
+class TestStopDate(unittest.TestCase):
+    """Slutdatoen sammenlignes som tekst i formatet AAAA-MM-DD.
+
+    Det virker fordi ISO-datoer sorterer korrekt alfabetisk, men det er kun
+    rigtigt saa laenge formatet holdes. Derfor testes graenserne.
+    """
+
+    STOP = "2026-12-01"
+
+    def stopped(self, today):
+        return today >= self.STOP
+
+    def test_runs_up_to_and_including_the_day_before(self):
+        self.assertFalse(self.stopped("2026-11-30"))
+        self.assertFalse(self.stopped("2026-09-25"))
+
+    def test_stops_on_the_date_itself(self):
+        self.assertTrue(self.stopped("2026-12-01"))
+
+    def test_stays_stopped_afterwards(self):
+        self.assertTrue(self.stopped("2026-12-02"))
+        self.assertTrue(self.stopped("2027-01-15"))
+
+
 class TestSchedule(unittest.TestCase):
     def test_daytime_both_slots(self):
         self.assertTrue(slot_is_active(datetime(2026, 9, 25, 9, 0)))

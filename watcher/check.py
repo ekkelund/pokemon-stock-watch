@@ -850,6 +850,29 @@ def main() -> int:
 
     targets = json.loads(TARGETS_PATH.read_text(encoding="utf-8"))
     state = load_state()
+
+    # Jagten har en slutdato. Den ligger i koden frem for at afhænge af at
+    # nogen husker at slukke, og der sendes én afskedsbesked så det ikke sker
+    # i stilhed: en overvågning der bare holder op med at sige noget, ser
+    # præcis ud som en der er gået i stykker.
+    stop_date = targets.get("watch_until")
+    if stop_date and f"{now:%Y-%m-%d}" >= stop_date:
+        print(f"{now:%Y-%m-%d}: slutdatoen {stop_date} er nået, overvågningen er slut")
+        if not state.get("_stopped_notified"):
+            notify(
+                "Lagerovervågningen er slut",
+                f"Vi var enige om at stoppe {stop_date}, og det er i dag.\n\n"
+                f"Der kommer ikke flere beskeder. Vil du i gang igen, så ret "
+                f"watch_until i watcher/targets.json, eller slå workflowet fra "
+                f"under Actions så det ikke kører forgæves.",
+                priority=3, tags=["checkered_flag"],
+                click="https://github.com/ekkelund/pokemon-stock-watch",
+                dry_run=args.dry_run,
+            )
+            state["_stopped_notified"] = True
+            if not args.dry_run:
+                save_state(state)
+        return 0
     print(f"Tjek kl. {now:%Y-%m-%d %H:%M %Z}\n")
 
     fallback_image = targets.get("default_image") or None

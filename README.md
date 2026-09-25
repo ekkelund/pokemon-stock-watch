@@ -117,6 +117,20 @@ UTC-timer ville forskyde vinduet en time to gange om året. Scriptet regner i
 rigtig lokaltid og rammer derfor korrekt hele året. De ekstra no-op-kørsler om
 natten koster ingenting, fordi Actions-minutter er gratis på offentlige repos.
 
+## Slutdato
+
+Jagten stopper **1. december 2026**. Sidste dag der tjekkes er 30. november.
+
+Datoen står som `watch_until` i `watcher/targets.json` frem for at afhænge af
+at nogen husker at slukke. På dagen sendes én afskedsbesked og derefter
+ingenting. Beskeden er ikke pynt: en overvågning der bare holder op med at
+sige noget, ser præcis ud som en der er gået i stykker, og det er en dårlig
+måde at finde ud af at man ikke længere bliver advaret.
+
+Vil du fortsætte, så ret datoen eller ryd feltet. Vil du stoppe helt, så slå
+workflowet fra under **Actions → Lagerovervågning → ⋯ → Disable workflow**,
+så det ikke kører forgæves hver halve time.
+
 ## Opsætning
 
 1. **Tilføj ntfy-topic som secret.** Settings → Secrets and variables →
