@@ -14,7 +14,7 @@ sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from check import (  # noqa: E402
     IN_STOCK, OUT_OF_STOCK, UNKNOWN,
     LOC_RE, PRODUCT_HREF_RE, detect_image, detect_status, is_product_url,
-    product_slug, slot_is_active, visible_text,
+    pretty_name, product_slug, slot_is_active, visible_text,
 )
 from datetime import datetime  # noqa: E402
 
@@ -305,6 +305,21 @@ class Test30thPattern(unittest.TestCase):
             "mile-pokemon-t-shirt-bright-white-116-cm",
         ]:
             self.assertFalse(self.hit(slug), slug)
+
+
+class TestPrettyName(unittest.TestCase):
+    def test_keeps_30th_lowercase(self):
+        # str.title() ville give "30Th", hvilket ser forkert ud i en
+        # notifikation man læser på en låseskærm.
+        self.assertEqual(pretty_name("pokemon-poster-collection-30th"),
+                         "Pokemon Poster Collection 30th")
+
+    def test_capitalises_words(self):
+        self.assertEqual(pretty_name("pokemon-elite-trainer-box-30th-samlekort"),
+                         "Pokemon Elite Trainer Box 30th Samlekort")
+
+    def test_handles_sizes_and_numbers(self):
+        self.assertEqual(pretty_name("sylveon-ex-box-30th"), "Sylveon Ex Box 30th")
 
 
 class TestSchedule(unittest.TestCase):

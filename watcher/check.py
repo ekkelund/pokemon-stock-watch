@@ -580,6 +580,14 @@ def is_product_url(url: str) -> bool:
     return bool(parts) and bool(ID_SEGMENT_RE.match(parts[-1]))
 
 
+def pretty_name(slug: str) -> str:
+    """Slug som læsbart navn. Ord med cifre lades i fred, så 30th ikke
+    bliver til 30Th."""
+    words = slug.replace("-", " ").split()
+    return " ".join(w if any(c.isdigit() for c in w) else w.capitalize()
+                    for w in words)
+
+
 def product_slug(url: str) -> str:
     """Varens læsbare navn fra URL'en, uden kategoristien.
 
@@ -707,14 +715,14 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
         for url in matches:
             if url in known or url in configured:
                 continue
-            label = product_slug(url).replace("-", " ") or url
+            label = pretty_name(product_slug(url)) or url
             known[url] = {"first_seen": now.isoformat(), "name": label}
             # Læg varen i lagerovervågning, så vi også fanger at den kommer
             # på lager, ikke kun at den er oprettet.
-            watched[url] = {"name": label.title(), "url": url}
+            watched[url] = {"name": label, "url": url}
             print(f"  NY: {label}")
             notify(
-                f"BOOSTER BUNDLE FUNDET: {label.title()}",
+                f"{name.upper()} FUNDET: {label}",
                 f"Ny vare i katalog: {label}.\n\nDen er nu også lagerovervåget."
                 f"\n\n{url}",
                 priority=5, tags=["package", "tada"], click=url,
