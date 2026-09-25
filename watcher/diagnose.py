@@ -70,6 +70,33 @@ def summarise(url: str) -> None:
     for api in apis[:15]:
         print(f"    {api[:160]}")
 
+    # Siderne kører Nuxt (data-n-head-ssr), ikke Next.js. Nuxt lægger sin
+    # SSR-tilstand i window.__NUXT__, ofte som et JS-funktionskald frem for
+    # ren JSON, så vi måler og kigger frem for at parse.
+    print(f"\nwindow.__NUXT__ til stede: {'__NUXT__' in html}")
+    nuxt = re.search(r"window\.__NUXT__\s*=\s*(.*?);?\s*</script>", html, re.DOTALL)
+    if nuxt:
+        blob = nuxt.group(1)
+        print(f"  længde: {len(blob)}")
+        print(f"  starter med: {blob[:200]}")
+        for needle in ("booster", "bundle", "productId", "\"id\"", "slug", "url"):
+            print(f"  forekomster af {needle}: {blob.lower().count(needle.lower().strip(chr(92)))}")
+
+    print("\nnøgleord i hele HTML:")
+    for needle in ("booster", "bundle", "pokemon", "/produkter/", "productId",
+                   "__NUXT__", "stock", "udsolgt", "/api/"):
+        print(f"  {needle}: {html.lower().count(needle.lower())}")
+
+    all_srcs = SCRIPT_SRC_RE.findall(html)
+    print(f"\nalle script-src ({len(all_srcs)}):")
+    for src in all_srcs[:15]:
+        print(f"    {src[:120]}")
+
+    inline = [b for b in re.findall(r"<script\b[^>]*>(.*?)</script>", html, re.DOTALL) if b.strip()]
+    print(f"\ninline scripts: {len(inline)}")
+    for i, body in enumerate(sorted(inline, key=len, reverse=True)[:5]):
+        print(f"    [{i}] {len(body)} tegn: {body.strip()[:220]}")
+
     print("\n--- første 700 tegn ---")
     print(html[:700].replace("\n", " "))
     print()
