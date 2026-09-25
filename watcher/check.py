@@ -541,8 +541,14 @@ def check_product(target: dict, state: dict, now: datetime, dry_run: bool,
         print("  gik fra på lager til udsolgt (ingen notifikation)")
 
 
-SITEMAP_INDEX_PATH = "/sitemap/sitemap-index.xml"
 LOC_RE = re.compile(r"<loc>([^<]+)</loc>")
+ROBOTS_SITEMAP_RE = re.compile(r"(?im)^\s*Sitemap:\s*(\S+)")
+
+# Sidste sti-segment på en produktside er varens id. Bilka, BR og føtex bruger
+# rene tal (/produkter/<slug>/200392202/), salling.dk bruger p-foran
+# (/boern/toej/<slug>/p-1180431/). Segmentet før er i begge tilfælde slug'en,
+# altså et læsbart produktnavn.
+ID_SEGMENT_RE = re.compile(r"^(?:p-)?\d{4,}$")
 
 # Sitemappene fylder flere megabyte. De hentes derfor sjældent: de er en
 # opdagelsesmekanisme, ikke en lagermåling, og nye varer dukker alligevel først
@@ -550,18 +556,75 @@ LOC_RE = re.compile(r"<loc>([^<]+)</loc>")
 DISCOVERY_INTERVAL_HOURS = 11
 
 
+def url_segments(url: str):
+    return [part for part in urllib.parse.urlparse(url).path.split("/") if part]
+
+
+def is_product_url(url: str) -> bool:
+    """Peger URL'en på en vare frem for en kategori- eller indholdsside?"""
+    parts = url_segments(url)
+    return bool(parts) and bool(ID_SEGMENT_RE.match(parts[-1]))
+
+
+def product_slug(url: str) -> str:
+    """Varens læsbare navn fra URL'en, uden kategoristien.
+
+    Der matches på slug'en alene og ikke på hele URL'en, fordi kategorinavne
+    ellers kan udløse falske træf: salling.dk har hundredvis af hudpleje-varer
+    med "booster" i stien.
+    """
+    parts = url_segments(url)
+    if not parts:
+        return ""
+    if ID_SEGMENT_RE.match(parts[-1]) and len(parts) > 1:
+        return parts[-2]
+    return parts[-1]
+
+
+def _collect_locs(body: str, seen: set, depth: int = 0):
+    """URLer fra et sitemap, og fra dets undersitemaps hvis det er et index."""
+    locs = LOC_RE.findall(body)
+    if "<sitemapindex" not in body[:600].lower():
+        return locs
+    if depth >= 2:
+        return []
+    out = []
+    for child in locs:
+        if child in seen:
+            continue
+        seen.add(child)
+        child_body, _ = http_get(child)
+        if child_body:
+            out.extend(_collect_locs(child_body, seen, depth + 1))
+    return out
+
+
 def sitemap_product_urls(site: str):
-    """Alle produkt-URLer fra et sites sitemap. Returnerer (urls, fejl)."""
-    index, error = http_get(site + SITEMAP_INDEX_PATH)
-    if index is None:
-        return None, f"sitemap-index: {error}"
-    urls = []
-    for child in LOC_RE.findall(index):
-        body, error = http_get(child)
+    """Alle produkt-URLer fra et sites sitemap. Returnerer (urls, fejl).
+
+    Sitemappets placering slås op i robots.txt, som er standardmåden at
+    annoncere den på. Koncernens sider ligger ikke på samme platform:
+    bilka/br/foetex bruger /sitemap/sitemap-index.xml, mens netto og salling
+    bruger /sitemap.xml. En hardkodet sti ville kun virke det ene sted.
+    """
+    robots, _ = http_get(site + "/robots.txt")
+    candidates = ROBOTS_SITEMAP_RE.findall(robots) if robots else []
+    candidates += [site + "/sitemap/sitemap-index.xml", site + "/sitemap.xml"]
+
+    seen, last_error = set(), "intet sitemap kunne læses"
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        body, error = http_get(candidate)
         if body is None:
-            return None, f"{child}: {error}"
-        urls.extend(loc for loc in LOC_RE.findall(body) if "/produkter/" in loc)
-    return urls, None
+            last_error = f"{candidate}: {error}"
+            continue
+        urls = _collect_locs(body, seen)
+        if urls:
+            return [u for u in urls if is_product_url(u)], None
+        last_error = f"{candidate}: ingen URLer i sitemappet"
+    return None, last_error
 
 
 def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
@@ -606,14 +669,14 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
                 )
             continue
         total += len(urls)
-        matches = [u for u in urls if pattern.search(u.replace("-", " "))]
+        matches = [u for u in urls
+                   if pattern.search(product_slug(u).replace("-", " "))]
         print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher")
 
         for url in matches:
             if url in known:
                 continue
-            slug_match = PRODUCT_HREF_RE.search(url)
-            label = (slug_match.group(1).replace("-", " ") if slug_match else url)
+            label = product_slug(url).replace("-", " ") or url
             known[url] = {"first_seen": now.isoformat(), "name": label}
             # Læg varen i lagerovervågning, så vi også fanger at den kommer
             # på lager, ikke kun at den er oprettet.

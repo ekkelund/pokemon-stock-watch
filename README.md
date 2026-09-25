@@ -16,6 +16,44 @@ automatisk i lagerovervågning, så du også får besked når den kan købes.
 
 Mål redigeres i `watcher/targets.json`.
 
+### De fem sites
+
+Koncernen har fem webadresser, men de er ikke ens. Målt 25. september 2026:
+
+| Site | Varer i sitemap | Samlekort | Med i overvågning |
+|---|---|---|---|
+| bilka.dk | 56.456 | ja | ja |
+| foetex.dk | 39.642 | ja | ja |
+| br.dk | 16.848 | ja | ja |
+| salling.dk | 261.768 | nej | ja, som beredskab |
+| netto.dk | 0 | nej | ja, som snubletråd |
+
+De tre første er der hvor det sker. De har samlekort, kender vare 200392202,
+og kører den Nuxt-platform hvor produktsider leverer schema.org JSON-LD.
+
+**salling.dk er et modehus** på en helt anden platform. De 39 Pokémon-fund er
+t-shirts og shorts, og de 44 booster-fund er hårserum og ansigtscreme. Der er
+ingen samlekort i dag. Det er taget med alligevel, fordi det faktisk *er* en
+webshop og sortimentet kan ændre sig.
+
+**netto.dk er ikke en webshop.** Sitemappet rummer 686 sider, hvoraf 584 er
+butiksadresser og 43 er opskrifter. Nul varer. Det er taget med som en billig
+snubletråd: skulle Netto åbne en shop, dukker varerne op i sitemappet, og så
+fanger overvågningen det. Det koster 686 URLer hver 11. time, altså intet.
+
+Fordi de to platforme har forskellige URL-former, matches der på varens **slug
+alene** og ikke på hele URL'en:
+
+```
+bilka:   /produkter/pokemon-booster-bundle-mega/200555666/
+salling: /skoenhed/haar/haarpleje/booster-serum-100-ml/p-384325/
+                                  ^^^^^^^ kun dette led tæller
+```
+
+Uden den afgrænsning ville salling.dk's hudplejekategori kunne udløse falske
+alarmer. Sitemappets placering slås op i `robots.txt` frem for at være
+hardkodet, netop fordi de to platforme lægger den forskellige steder.
+
 ### Hvorfor sitemap og ikke kategorisiderne
 
 De oprindelige mål var tre oversigtssider. Første rigtige kørsel viste at de

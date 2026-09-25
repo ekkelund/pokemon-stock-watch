@@ -13,8 +13,8 @@ import unittest
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from check import (  # noqa: E402
     IN_STOCK, OUT_OF_STOCK, UNKNOWN,
-    LOC_RE, PRODUCT_HREF_RE, detect_image, detect_status, slot_is_active,
-    visible_text,
+    LOC_RE, PRODUCT_HREF_RE, detect_image, detect_status, is_product_url,
+    product_slug, slot_is_active, visible_text,
 )
 from datetime import datetime  # noqa: E402
 
@@ -189,6 +189,47 @@ class TestDiscovery(unittest.TestCase):
         match = PRODUCT_HREF_RE.search(self.product_urls()[0])
         self.assertEqual(match.group(2), "200555666")
         self.assertEqual(match.group(1), "pokemon-booster-bundle-mega")
+
+
+class TestUrlShapes(unittest.TestCase):
+    """De fem sites deler ikke URL-form.
+
+    bilka/br/foetex: /produkter/<slug>/<tal>/
+    salling:         /<kategorier>/<slug>/p-<tal>/
+    netto:           ingen varer overhovedet
+    """
+
+    BILKA = "https://www.bilka.dk/produkter/pokemon-booster-bundle-mega/200555666/"
+    SALLING = ("https://salling.dk/boern/toej/t-shirts/"
+               "mile-pokemon-t-shirt-bright-white-116-cm/p-1180431/")
+    SALLING_BEAUTY = ("https://salling.dk/skoenhed/haar/haarpleje/"
+                      "booster-serum-100-ml/p-384325/")
+    NETTO = "https://netto.dk/butikker/netto-aarhus-c/"
+
+    def test_recognises_product_urls(self):
+        self.assertTrue(is_product_url(self.BILKA))
+        self.assertTrue(is_product_url(self.SALLING))
+
+    def test_rejects_non_product_urls(self):
+        self.assertFalse(is_product_url(self.NETTO))
+        self.assertFalse(is_product_url("https://www.bilka.dk/c/legetoej/"))
+
+    def test_slug_excludes_category_path(self):
+        self.assertEqual(product_slug(self.BILKA), "pokemon-booster-bundle-mega")
+        self.assertEqual(product_slug(self.SALLING),
+                         "mile-pokemon-t-shirt-bright-white-116-cm")
+
+    def test_category_path_cannot_cause_false_match(self):
+        # Hele URL'en indeholder både "booster" og et kategoriord, men slug'en
+        # er det eneste der må tælle. Ellers ville hudpleje udløse alarmer.
+        pattern = re.compile("booster.{0,15}bundle", re.IGNORECASE)
+        self.assertIsNone(
+            pattern.search(product_slug(self.SALLING_BEAUTY).replace("-", " ")))
+
+    def test_bundle_in_slug_still_matches(self):
+        pattern = re.compile("booster.{0,15}bundle", re.IGNORECASE)
+        self.assertIsNotNone(
+            pattern.search(product_slug(self.BILKA).replace("-", " ")))
 
 
 class TestSchedule(unittest.TestCase):

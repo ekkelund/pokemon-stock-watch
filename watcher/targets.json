@@ -35,7 +35,18 @@
     "sitemappet er udgivet til crawlere, dækker hele katalogets varer i stedet",
     "for én kategori, og har slugs der er læsbare produktnavne.",
     "Fundne varer lægges automatisk i lagerovervågning.",
-    "Kører hver 11. time, ikke hver kørsel: sitemappene fylder flere megabyte."
+    "Kører hver 11. time, ikke hver kørsel: sitemappene fylder flere megabyte.",
+    "",
+    "Om de fem sites (målt 2026-09-25, se README):",
+    "  bilka, br, foetex - webshops med samlekort. Her sker det.",
+    "  salling - modehus. 261.768 varer, men Pokemon-fundene er t-shirts og",
+    "    shorts, og booster-fundene er hudpleje. Ingen samlekort i dag.",
+    "    Medtaget fordi det ER en webshop og sortimentet kan ændre sig.",
+    "  netto - ingen webshop. Sitemappet rummer 686 sider, naesten alle",
+    "    butiksadresser og opskrifter, nul varer. Medtaget som billig",
+    "    snubletraad hvis Netto nogensinde aabner en shop.",
+    "Der matches paa varens slug alene, ikke paa hele URL'en: salling.dk har",
+    "hundredvis af hudpleje-varer med booster i kategoristien."
   ],
   "discovery": [
     {
@@ -45,7 +56,9 @@
       "sites": [
         "https://www.bilka.dk",
         "https://www.br.dk",
-        "https://www.foetex.dk"
+        "https://www.foetex.dk",
+        "https://salling.dk",
+        "https://netto.dk"
       ]
     }
   ]
