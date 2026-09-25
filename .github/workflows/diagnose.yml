@@ -1,0 +1,19 @@
+name: Diagnose
+
+# Manuelt værktøj. Udviklingsmiljøet kan ikke nå Sallings domæner, så denne
+# workflow bruges til at undersøge en sides opbygning fra en runner der kan.
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: 'URLer adskilt af mellemrum (tom = listesiderne fra targets.json)'
+        type: string
+        default: ''
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 watcher/diagnose.py ${{ inputs.urls }}
