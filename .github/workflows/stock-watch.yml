@@ -17,6 +17,10 @@ on:
         description: 'Skriv notifikationer til loggen i stedet for at sende dem'
         type: boolean
         default: false
+      test_notify:
+        description: 'Send kun en testbesked til ntfy og afslut'
+        type: boolean
+        default: false
 
 # Overlappende kørsler ville kunne skrive state.json oven i hinanden og
 # udløse dubletnotifikationer. En ny kørsel venter i stedet.
@@ -49,7 +53,8 @@ jobs:
           fi
           python3 watcher/check.py \
             ${{ inputs.force && '--force' || '' }} \
-            ${{ inputs.dry_run && '--dry-run' || '' }}
+            ${{ inputs.dry_run && '--dry-run' || '' }} \
+            ${{ inputs.test_notify && '--test-notify' || '' }}
 
       - name: Gem state
         if: ${{ !inputs.dry_run }}

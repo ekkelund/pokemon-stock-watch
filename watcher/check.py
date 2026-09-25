@@ -600,7 +600,22 @@ def main() -> int:
                         help="skriv notifikationer til konsollen i stedet for ntfy")
     parser.add_argument("--probe", metavar="URL",
                         help="hent én URL og udskriv hvad kaskaden finder")
+    parser.add_argument("--test-notify", action="store_true",
+                        help="send én testbesked og afslut, uden at røre state")
     args = parser.parse_args()
+
+    if args.test_notify:
+        # Bevis at hele vejen til telefonen virker. Uden den kan en forkert
+        # secret først vise sig den dag varen rent faktisk kommer på lager.
+        notify(
+            "Test fra lagerovervågningen",
+            "Virker denne besked, når de rigtige også frem. "
+            "Ingen varer er kommet på lager; dette er kun en test.",
+            priority=3, tags=["white_check_mark"],
+            click="https://github.com/ekkelund/pokemon-stock-watch/actions",
+            dry_run=args.dry_run,
+        )
+        return 0
 
     if args.probe:
         html, error = http_get(args.probe)
