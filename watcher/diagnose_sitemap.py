@@ -12,14 +12,26 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check import http_get  # noqa: E402
 
-SITES = ["https://www.bilka.dk", "https://www.br.dk", "https://www.foetex.dk"]
+DEFAULT_SITES = ["https://www.bilka.dk", "https://www.br.dk", "https://www.foetex.dk"]
 LOC_RE = re.compile(r"<loc>([^<]+)</loc>")
 
+# Vare-id for Elite Trainer Box 30th. Går igen på tværs af koncernens sider,
+# så den afslører om et nyt site deler varenummer-rum med de kendte.
+KNOWN_PRODUCT_ID = "200392202"
 
-for base in SITES:
+
+for base in (sys.argv[1:] or DEFAULT_SITES):
     print("=" * 78)
     print(base)
     print("=" * 78)
+    robots, err = http_get(f"{base}/robots.txt")
+    if robots is None:
+        print(f"robots.txt: FEJL {err}")
+    else:
+        sitemaps = re.findall(r"(?im)^\s*Sitemap:\s*(\S+)", robots)
+        disallows = re.findall(r"(?im)^\s*Disallow:\s*(\S+)", robots)
+        print(f"robots.txt: {len(disallows)} Disallow, sitemap-henvisninger: {sitemaps}")
+
     index, err = http_get(f"{base}/sitemap/sitemap-index.xml")
     if index is None:
         print(f"sitemap-index: FEJL {err}\n")
@@ -45,6 +57,11 @@ for base in SITES:
             print(f"    eksempel: {products[0]}")
 
     print(f"\n  produkter i alt: {len(all_products)}")
+    known = [l for l in all_products if KNOWN_PRODUCT_ID in l]
+    print(f"  kender vare {KNOWN_PRODUCT_ID} (ETB 30th): {'JA' if known else 'nej'}")
+    for k in known[:2]:
+        print(f"      {k}")
+
     for label, pattern in [("pokemon", r"pokemon"),
                            ("booster", r"booster"),
                            ("booster bundle", r"booster.{0,15}bundle"),

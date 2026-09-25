@@ -2,6 +2,11 @@ name: Diagnose Sitemap
 
 on:
   workflow_dispatch:
+    inputs:
+      sites:
+        description: 'Sites adskilt af mellemrum (tom = de overvågede)'
+        type: string
+        default: ''
 
 jobs:
   diagnose:
@@ -9,4 +14,4 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: python3 watcher/diagnose_sitemap.py
+      - run: python3 watcher/diagnose_sitemap.py ${{ inputs.sites }}
