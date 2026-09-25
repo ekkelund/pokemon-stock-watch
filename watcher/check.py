@@ -580,6 +580,12 @@ def is_product_url(url: str) -> bool:
     return bool(parts) and bool(ID_SEGMENT_RE.match(parts[-1]))
 
 
+def shop_name(url: str) -> str:
+    """Butikkens navn fra URL'en, fx BR eller Bilka."""
+    host = urllib.parse.urlparse(url).netloc.replace("www.", "").split(".")[0]
+    return {"br": "BR", "foetex": "føtex"}.get(host, host.capitalize())
+
+
 def pretty_name(slug: str) -> str:
     """Slug som læsbart navn. Ord med cifre lades i fred, så 30th ikke
     bliver til 30Th."""
@@ -728,8 +734,12 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
 
     for product_id, urls in sorted(by_product.items()):
         for url in urls:
-            watched.setdefault(url, {"name": pretty_name(product_slug(url)),
-                                     "url": url})
+            # Butikken skal stå i navnet. Samme vare overvåges på tre sider, og
+            # en notifikation der kun siger varenavnet fortæller ikke hvor man
+            # skal klikke hen, hvilket er det eneste der tæller midt i et drop.
+            watched.setdefault(url, {
+                "name": f"{pretty_name(product_slug(url))} ({shop_name(url)})",
+                "url": url})
         if product_id in known:
             continue
         label = pretty_name(product_slug(urls[0])) or product_id

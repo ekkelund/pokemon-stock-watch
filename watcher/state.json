@@ -32,15 +32,15 @@
   },
   "watched_products": {
     "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/": {
-      "name": "Pokemon 30th Samlekort",
+      "name": "Pokemon 30th Samlekort (Bilka)",
       "url": "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/"
     },
     "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/": {
-      "name": "Pokemon 30th Samlekort",
+      "name": "Pokemon 30th Samlekort (BR)",
       "url": "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/"
     },
     "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/": {
-      "name": "Pokemon 30th Samlekort",
+      "name": "Pokemon 30th Samlekort (føtex)",
       "url": "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/"
     }
   }

@@ -14,7 +14,7 @@ sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from check import (  # noqa: E402
     IN_STOCK, OUT_OF_STOCK, UNKNOWN,
     LOC_RE, PRODUCT_HREF_RE, detect_image, detect_status, is_product_url,
-    pretty_name, product_slug, slot_is_active, visible_text,
+    pretty_name, product_slug, shop_name, slot_is_active, visible_text,
 )
 from datetime import datetime  # noqa: E402
 
@@ -347,6 +347,18 @@ class TestPrettyName(unittest.TestCase):
 
     def test_handles_sizes_and_numbers(self):
         self.assertEqual(pretty_name("sylveon-ex-box-30th"), "Sylveon Ex Box 30th")
+
+
+class TestShopName(unittest.TestCase):
+    def test_reads_shop_from_url(self):
+        cases = {
+            "https://www.br.dk/produkter/x/1/": "BR",
+            "https://www.bilka.dk/produkter/x/1/": "Bilka",
+            "https://www.foetex.dk/produkter/x/1/": "føtex",
+            "https://salling.dk/a/b/p-1/": "Salling",
+        }
+        for url, expected in cases.items():
+            self.assertEqual(shop_name(url), expected)
 
 
 class TestSchedule(unittest.TestCase):
