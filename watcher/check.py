@@ -178,16 +178,60 @@ OG_IMAGE_RE = re.compile(
 )
 
 
+def _first_image_url(value):
+    """Første brugbare billed-URL i en schema.org image-værdi.
+
+    Feltet kan være en streng, en liste af strenge, eller ImageObject'er med
+    url/contentUrl. Salling bruger en liste, og læses den ikke, falder vi
+    tilbage på og:image, som er en bred beskæring til sociale medier og
+    dermed et dårligere billede end det der lå lige for.
+    """
+    if isinstance(value, str):
+        return value.strip() or None
+    if isinstance(value, dict):
+        for key in ("url", "contentUrl"):
+            candidate = value.get(key)
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate.strip()
+        return None
+    if isinstance(value, list):
+        for item in value:
+            found = _first_image_url(item)
+            if found:
+                return found
+    return None
+
+
+def _image_in_node(node):
+    """Find et image-felt hvor som helst i en JSON-LD-blok, også under @graph."""
+    if isinstance(node, dict):
+        if "image" in node:
+            found = _first_image_url(node["image"])
+            if found:
+                return found
+        for value in node.values():
+            found = _image_in_node(value)
+            if found:
+                return found
+    elif isinstance(node, list):
+        for item in node:
+            found = _image_in_node(item)
+            if found:
+                return found
+    return None
+
+
 def detect_image(html: str, base_url: str):
     """Find produktets billede, så notifikationen viser den faktiske vare.
 
     JSON-LD foretrækkes: "image" på et Product er varen selv, mens og:image
-    på en listeside lige så godt kan være butikkens logo.
+    på en produktside er den beskårne udgave til sociale medier og på en
+    listeside lige så godt kan være butikkens logo.
     """
     for entry in parse_ld_json(html):
-        for _path, key, value in walk_json(entry):
-            if key.lower() == "image" and isinstance(value, str) and value.strip():
-                return urllib.parse.urljoin(base_url, value.strip())
+        found = _image_in_node(entry)
+        if found:
+            return urllib.parse.urljoin(base_url, found)
     match = OG_IMAGE_RE.search(html)
     if match:
         return urllib.parse.urljoin(base_url, match.group(1).strip())

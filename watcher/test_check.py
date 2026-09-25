@@ -115,6 +115,30 @@ class TestImage(unittest.TestCase):
         html = page('''<script type="application/ld+json">{"@type":"Product","image":"https://cdn.example/vare.jpg"}</script><meta property="og:image" content="https://cdn.example/logo.png">''')
         self.assertEqual(detect_image(html, self.BASE), "https://cdn.example/vare.jpg")
 
+    def test_image_list_beats_og_image(self):
+        # Salling leverer image som en liste. Læses den ikke, falder vi tilbage
+        # på og:image, som er en bred 1.9:1-beskæring til sociale medier.
+        html = page(
+            '''<script type="application/ld+json">{"@type":"Product",'''
+            '''"image":["https://cdn.example/vare-1.jpg","https://cdn.example/vare-2.jpg"]}'''
+            '''</script><meta property="og:image" content="https://cdn.example/social.jpg?ar=1.9:1">'''
+        )
+        self.assertEqual(detect_image(html, self.BASE), "https://cdn.example/vare-1.jpg")
+
+    def test_image_object_with_url(self):
+        html = page(
+            '''<script type="application/ld+json">{"@type":"Product",'''
+            '''"image":{"@type":"ImageObject","url":"https://cdn.example/obj.jpg"}}</script>'''
+        )
+        self.assertEqual(detect_image(html, self.BASE), "https://cdn.example/obj.jpg")
+
+    def test_image_nested_under_graph(self):
+        html = page(
+            '''<script type="application/ld+json">{"@graph":[{"@type":"WebSite"},'''
+            '''{"@type":"Product","image":["https://cdn.example/graf.jpg"]}]}</script>'''
+        )
+        self.assertEqual(detect_image(html, self.BASE), "https://cdn.example/graf.jpg")
+
     def test_falls_back_to_og_image(self):
         html = page('<meta property="og:image" content="https://cdn.example/logo.png">')
         self.assertEqual(detect_image(html, self.BASE), "https://cdn.example/logo.png")
