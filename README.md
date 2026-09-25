@@ -10,10 +10,34 @@ stå en maskine tændt derhjemme.
 når varen skifter fra utilgængelig til på lager. Alle tre sider tjekkes, fordi
 Salling ikke nødvendigvis frigiver lager samtidig på dem.
 
-**Booster bundles** på tre oversigtssider. Notifikation når et produkt hvis
-navn eller URL matcher `booster.{0,15}bundle` dukker op for første gang.
+**Booster bundles** opdages via sitemap. Notifikation når en vare hvis URL
+matcher `booster.{0,15}bundle` dukker op i kataloget, og varen lægges derefter
+automatisk i lagerovervågning, så du også får besked når den kan købes.
 
 Mål redigeres i `watcher/targets.json`.
+
+### Hvorfor sitemap og ikke kategorisiderne
+
+De oprindelige mål var tre oversigtssider. Første rigtige kørsel viste at de
+ikke indeholder ét eneste produktlink i HTML'en: siderne kører Nuxt, og
+produktgitteret hentes først efter hydrering. Uden en browser er der intet at
+læse.
+
+Sitemappet løser det bedre end en browser ville:
+
+- Det er udgivet netop så crawlere må læse det, og `robots.txt` peger på det.
+- Det dækker hele katalogets varer, ikke kun én kategoriside. Havde vi holdt
+  os til kategorisiderne, ville en bundle placeret i en anden kategori aldrig
+  blive fundet.
+- Slug'en i `/produkter/<slug>/<id>/` er et læsbart produktnavn, så matchet
+  kan ske direkte på URL'en.
+
+føtex-søgesiden er droppet som mål: `robots.txt` har `Disallow: /search`.
+Sitemappet dækker føtex alligevel.
+
+Sitemappene fylder flere megabyte, så opdagelsen kører hver 11. time i stedet
+for hver kørsel. Lagerovervågningen af konkrete varer kører fuld kadence, og
+det er den der er tidskritisk.
 
 ## Kadence
 
@@ -66,7 +90,8 @@ Sallings sider er Next.js-drevne, og deres interne datastruktur er hverken
 dokumenteret eller stabil. Lagerstatus aflæses derfor gennem en kaskade, fra
 mest til mindst pålidelig:
 
-1. `json-ld` - schema.org `offers.availability`. Mest pålidelig.
+1. `json-ld` - schema.org `offers.availability`. Mest pålidelig, og den der
+   faktisk bruges: alle tre sider leverer korrekt JSON-LD på produktsider.
 2. `embedded-json` - `__NEXT_DATA__` gennemsøgt for lager-agtige nøgler.
 3. `script-text` - nøgle/værdi-par fundet i App Router-payloads.
 4. `text` - danske vendinger som "Udsolgt" og "Læg i kurv". Lav tiltro:
@@ -80,18 +105,14 @@ end en der siger højt at den er gået i stykker. Samme gælder listesiderne, hv
 nul fundne produktlinks behandles som en fejl og ikke som "ingen bundles".
 Diagnoser sendes højst hver 12. time pr. mål, så en vedvarende fejl ikke spammer.
 
-**Det er endnu ikke bekræftet mod de rigtige sider.** Overvågningen er udviklet
-i et miljø uden adgang til bilka.dk, foetex.dk og br.dk, så kaskaden er testet
-mod syntetiske sider, ikke mod Sallings faktiske markup. To ting kan derfor vise
-sig ved første rigtige kørsel:
+**Produktsiderne er bekræftet mod de rigtige sider.** Alle tre leverer
+schema.org JSON-LD med korrekt `availability`, og Salling afviser ikke
+GitHub-runnernes IP-adresser. Lagerdelen hviler altså på den mest pålidelige
+metode i kaskaden, ikke på tekstgætteri.
 
-- Listerne bygges måske udelukkende af JavaScript, så der ikke står produktlinks
-  i HTML'en. Så melder overvågningen "kan ikke aflæse".
-- Salling kan afvise trafik fra datacenter-IP'er. Så melder den HTTP 403.
-
-Begge dele rapporterer sig selv via ntfy frem for at fejle i stilhed. Kør
-`python3 watcher/check.py --probe <url>` for at se præcis hvad en given side
-giver, og justér derfra.
+De øvrige trin i kaskaden er sikkerhedsnet, testet mod syntetiske sider. Skulle
+Salling holde op med at levere JSON-LD, træder de til, og notifikationen bærer
+da et forbehold om hvilken metode der blev brugt.
 
 ## Tilstand
 
@@ -110,4 +131,9 @@ automatisk efter 60 dage uden aktivitet i repoet).
 python3 watcher/check.py --force --dry-run   # tjek nu, send intet
 python3 watcher/check.py --probe <url>       # vis hvad kaskaden finder på én side
 python3 watcher/test_check.py                # kør testene
+python3 watcher/diagnose.py <url>            # udskriv en sides opbygning
+python3 watcher/diagnose_sitemap.py          # tæl produkter og match i sitemappene
 ```
+
+De to diagnoseværktøjer kan også køres fra fanen Actions, hvilket er nyttigt
+når man undersøger fra en maskine uden adgang til domænerne.

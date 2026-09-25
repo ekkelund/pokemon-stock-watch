@@ -1,22 +1,16 @@
 {
-  "_comment": [
-    "Mål for lagerovervågningen. To typer:",
-    "  product - én konkret vare. Notifikation når den skifter til på lager.",
-    "  listing - kategori-/søgeside. Notifikation når et nyt produkt der matcher",
-    "            'match' dukker op, eller når et kendt match skifter til på lager.",
-    "Sporings-parametre (srsltid, gclid, gad_source ...) er strippet fra URL'erne:",
-    "de er irrelevante for indholdet og gør kun loggen støjende."
-  ],
-
-  "_default_image": [
+  "_om_billedet": [
     "Billede der vedhæftes notifikationer når varens eget billede ikke kan",
-    "findes på siden (fx ved listesiderne). Skal være en offentligt tilgængelig",
-    "URL. Upload billedet til assets/ i dette repo og brug raw-URL'en:",
-    "https://raw.githubusercontent.com/ekkelund/pokemon-stock-watch/main/assets/<filnavn>",
-    "Produktsider behøver den ikke: der hentes varens eget billede automatisk."
+    "aflæses fra siden. Produktsider behøver det ikke: der hentes varens eget.",
+    "Upload til assets/ og brug raw-URL'en:",
+    "https://raw.githubusercontent.com/ekkelund/pokemon-stock-watch/main/assets/<filnavn>"
   ],
   "default_image": "",
 
+  "_om_produkter": [
+    "Konkrete varer der følges hver kørsel. Lagerstatus aflæses fra sidens",
+    "schema.org JSON-LD, som alle tre sider leverer korrekt."
+  ],
   "products": [
     {
       "key": "etb30-br",
@@ -35,24 +29,24 @@
     }
   ],
 
-  "listings": [
+  "_om_opdagelse": [
+    "Nye varer opdages via sitemap frem for kategorisiderne. Kategorisiderne",
+    "bygges af JavaScript og indeholder ingen produktlinks i HTML'en, mens",
+    "sitemappet er udgivet til crawlere, dækker hele katalogets varer i stedet",
+    "for én kategori, og har slugs der er læsbare produktnavne.",
+    "Fundne varer lægges automatisk i lagerovervågning.",
+    "Kører hver 11. time, ikke hver kørsel: sitemappene fylder flere megabyte."
+  ],
+  "discovery": [
     {
-      "key": "bundle-bilka",
-      "name": "Booster Bundle (Bilka, samlekort)",
-      "url": "https://www.bilka.dk/boern-leg/legetoej/samlekort/pl/samlekort/",
-      "match": "booster.{0,15}bundle"
-    },
-    {
-      "key": "bundle-br",
-      "name": "Booster Bundle (BR, Pokémon-kort)",
-      "url": "https://www.br.dk/maerker/o-aa/pokemon/pokemon-kort/pl/pokemon-kort/",
-      "match": "booster.{0,15}bundle"
-    },
-    {
-      "key": "bundle-foetex",
-      "name": "Booster Bundle (føtex, søgning)",
-      "url": "https://www.foetex.dk/search/?q=pokemon+booster+bundle",
-      "match": "booster.{0,15}bundle"
+      "key": "booster-bundle",
+      "name": "Booster Bundle",
+      "match": "booster.{0,15}bundle",
+      "sites": [
+        "https://www.bilka.dk",
+        "https://www.br.dk",
+        "https://www.foetex.dk"
+      ]
     }
   ]
 }

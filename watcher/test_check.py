@@ -13,7 +13,8 @@ import unittest
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from check import (  # noqa: E402
     IN_STOCK, OUT_OF_STOCK, UNKNOWN,
-    detect_image, detect_status, find_products, slot_is_active, visible_text,
+    LOC_RE, PRODUCT_HREF_RE, detect_image, detect_status, slot_is_active,
+    visible_text,
 )
 from datetime import datetime  # noqa: E402
 
@@ -126,22 +127,44 @@ class TestImage(unittest.TestCase):
         self.assertIsNone(detect_image(page("<p>ingen billeder</p>"), self.BASE))
 
 
-class TestListing(unittest.TestCase):
-    def setUp(self):
-        self.pattern = re.compile("booster.{0,15}bundle", re.IGNORECASE)
+class TestDiscovery(unittest.TestCase):
+    """Opdagelse sker via sitemap, ikke via kategorisiderne.
 
-    def test_matches_bundle_via_slug(self):
-        found = find_products(LISTING, self.pattern)
-        self.assertEqual([p["id"] for p in found], ["200111222"])
-        self.assertIn("booster bundle", found[0]["name"])
+    Kategorisiderne bygges af JavaScript og indeholder ingen produktlinks i
+    HTML'en; sitemappet er udgivet til crawlere og dækker hele kataloget.
+    """
 
-    def test_ignores_non_bundle_products(self):
-        ids = [p["id"] for p in find_products(LISTING, self.pattern)]
-        self.assertNotIn("200392202", ids)  # elite trainer box
-        self.assertNotIn("200333444", ids)  # løs booster-pakke, ikke bundle
+    PATTERN = re.compile("booster.{0,15}bundle", re.IGNORECASE)
+    SITEMAP = """<?xml version="1.0"?><urlset>
+      <url><loc>https://www.br.dk/produkter/pokemon-booster-bundle-mega/200555666/</loc></url>
+      <url><loc>https://www.br.dk/produkter/pokemon-elite-trainer-box-30th-samlekort/200392202/</loc></url>
+      <url><loc>https://www.br.dk/produkter/panini-hot-wheel-samlekort-booster-pakke/200315819/</loc></url>
+      <url><loc>https://www.br.dk/c/legetoej/</loc></url>
+    </urlset>"""
 
-    def test_no_products_on_empty_page(self):
-        self.assertEqual(find_products(OPAQUE_PAGE, self.pattern), [])
+    def product_urls(self):
+        return [u for u in LOC_RE.findall(self.SITEMAP) if "/produkter/" in u]
+
+    def test_extracts_only_product_urls(self):
+        urls = self.product_urls()
+        self.assertEqual(len(urls), 3)
+        self.assertNotIn("https://www.br.dk/c/legetoej/", urls)
+
+    def test_matches_bundle_only(self):
+        # Bindestreger gøres til mellemrum, så mønsteret læser slug'en som navn.
+        hits = [u for u in self.product_urls()
+                if self.PATTERN.search(u.replace("-", " "))]
+        self.assertEqual(len(hits), 1)
+        self.assertIn("200555666", hits[0])
+
+    def test_loose_booster_is_not_a_bundle(self):
+        loose = "https://www.br.dk/produkter/panini-hot-wheel-samlekort-booster-pakke/200315819/"
+        self.assertIsNone(self.PATTERN.search(loose.replace("-", " ")))
+
+    def test_slug_and_id_are_recoverable(self):
+        match = PRODUCT_HREF_RE.search(self.product_urls()[0])
+        self.assertEqual(match.group(2), "200555666")
+        self.assertEqual(match.group(1), "pokemon-booster-bundle-mega")
 
 
 class TestSchedule(unittest.TestCase):

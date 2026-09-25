@@ -339,69 +339,10 @@ def detect_status(html: str):
 
 
 # --------------------------------------------------------------------------
-# Produkter på en liste-/søgeside
+# Produkt-URLer
 # --------------------------------------------------------------------------
 
 PRODUCT_HREF_RE = re.compile(r'/produkter/([a-z0-9\-]+)/(\d+)/?', re.IGNORECASE)
-
-
-def find_products(html: str, pattern: re.Pattern):
-    """Find produkter på en listeside hvis navn eller URL-slug matcher.
-
-    Slug'en i /produkter/<slug>/<id>/ er selv et læsbart produktnavn, så den
-    er et robust match-grundlag også når JSON-strukturen ikke kan læses.
-    """
-    found = {}
-
-    def remember(product_id, name, slug):
-        product_id = str(product_id)
-        haystack = f"{name} {slug}".replace("-", " ")
-        if not pattern.search(haystack):
-            return
-        existing = found.get(product_id)
-        # Foretræk et rigtigt navn frem for et slug-udledt.
-        if existing and existing["source"] == "name" and not name:
-            return
-        found[product_id] = {
-            "id": product_id,
-            "name": (name or slug.replace("-", " ")).strip(),
-            "slug": slug,
-            "source": "name" if name else "slug",
-        }
-
-    for entry in parse_ld_json(html):
-        for path, key, value in walk_json(entry):
-            if key.lower() == "name" and isinstance(value, str):
-                match = PRODUCT_HREF_RE.search(json.dumps(entry))
-                if match:
-                    remember(match.group(2), value, match.group(1))
-
-    data = parse_next_data(html)
-    if data is not None:
-        for path, key, value in walk_json(data):
-            if key.lower() in {"name", "title", "displayname"} and isinstance(value, str):
-                remember(_nearby_id(data, path) or value, value, "")
-
-    for slug, product_id in PRODUCT_HREF_RE.findall(html):
-        remember(product_id, "", slug)
-
-    return sorted(found.values(), key=lambda p: p["id"])
-
-
-def _nearby_id(root, path: str):
-    """Find et id-felt i samme objekt som en navne-sti."""
-    parent_path = path.rsplit(".", 1)[0]
-    node = root
-    for step in re.findall(r"[^.\[\]]+", parent_path):
-        try:
-            node = node[int(step)] if step.isdigit() else node[step]
-        except Exception:
-            return None
-    if isinstance(node, dict):
-        for key in ("id", "productId", "sku", "code", "itemNumber"):
-            if key in node and isinstance(node[key], (str, int)):
-                return node[key]
-    return None
 
 
 # --------------------------------------------------------------------------
@@ -544,61 +485,95 @@ def check_product(target: dict, state: dict, now: datetime, dry_run: bool,
         print("  gik fra på lager til udsolgt (ingen notifikation)")
 
 
-def check_listing(target: dict, state: dict, now: datetime, dry_run: bool,
-                  fallback_image: str | None = None) -> None:
-    key, name, url = target["key"], target["name"], target["url"]
-    pattern = re.compile(target.get("match", "booster.{0,15}bundle"), re.IGNORECASE)
+SITEMAP_INDEX_PATH = "/sitemap/sitemap-index.xml"
+LOC_RE = re.compile(r"<loc>([^<]+)</loc>")
+
+# Sitemappene fylder flere megabyte. De hentes derfor sjældent: de er en
+# opdagelsesmekanisme, ikke en lagermåling, og nye varer dukker alligevel først
+# op i takt med at butikken genopbygger dem.
+DISCOVERY_INTERVAL_HOURS = 11
+
+
+def sitemap_product_urls(site: str):
+    """Alle produkt-URLer fra et sites sitemap. Returnerer (urls, fejl)."""
+    index, error = http_get(site + SITEMAP_INDEX_PATH)
+    if index is None:
+        return None, f"sitemap-index: {error}"
+    urls = []
+    for child in LOC_RE.findall(index):
+        body, error = http_get(child)
+        if body is None:
+            return None, f"{child}: {error}"
+        urls.extend(loc for loc in LOC_RE.findall(body) if "/produkter/" in loc)
+    return urls, None
+
+
+def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
+                    fallback_image: str | None = None) -> None:
+    """Opdag nye varer der matcher et mønster, via sitemap.
+
+    Listesiderne bygges af JavaScript og kan ikke læses uden en browser.
+    Sitemappet er derimod udgivet netop så crawlere må læse det, dækker hele
+    katalogets varer i stedet for én kategoriside, og indeholder slugs der er
+    læsbare produktnavne. Fundne varer lægges i overvågning, så deres
+    lagerstatus derefter følges som enhver anden vare.
+    """
+    key, name = target["key"], target["name"]
+    pattern = re.compile(target["match"], re.IGNORECASE)
     entry = state.setdefault(key, {})
-    known = entry.setdefault("known_products", {})
-    print(f"[liste] {name}")
+    known = entry.setdefault("known_urls", {})
+    print(f"[opdagelse] {name}")
 
-    html, error = http_get(url)
-    if html is None:
-        print(f"  hentning mislykkedes: {error}")
-        if should_send_diagnostic(entry, now):
-            entry["last_diagnostic"] = now.isoformat()
+    last = entry.get("last_run")
+    if last and not target.get("always"):
+        try:
+            elapsed = now - datetime.fromisoformat(last)
+            if elapsed < timedelta(hours=DISCOVERY_INTERVAL_HOURS):
+                hours = elapsed.total_seconds() / 3600
+                print(f"  sidst kørt for {hours:.1f} timer siden, springer over")
+                return
+        except ValueError:
+            pass
+
+    watched = state.setdefault("watched_products", {})
+    total = 0
+    for site in target["sites"]:
+        urls, error = sitemap_product_urls(site)
+        if urls is None:
+            print(f"  {site}: {error}")
+            if should_send_diagnostic(entry, now):
+                entry["last_diagnostic"] = now.isoformat()
+                notify(
+                    f"Opdagelse fejler: {name}",
+                    f"Sitemap for {site} kunne ikke læses ({error}).",
+                    priority=2, tags=["warning"], dry_run=dry_run,
+                )
+            continue
+        total += len(urls)
+        matches = [u for u in urls if pattern.search(u.replace("-", " "))]
+        print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher")
+
+        for url in matches:
+            if url in known:
+                continue
+            slug_match = PRODUCT_HREF_RE.search(url)
+            label = (slug_match.group(1).replace("-", " ") if slug_match else url)
+            known[url] = {"first_seen": now.isoformat(), "name": label}
+            # Læg varen i lagerovervågning, så vi også fanger at den kommer
+            # på lager, ikke kun at den er oprettet.
+            watched[url] = {"name": label.title(), "url": url}
+            print(f"  NY: {label}")
             notify(
-                f"Overvågning fejler: {name}",
-                f"Siden kunne ikke hentes ({error}).",
-                priority=2, tags=["warning"], click=url, dry_run=dry_run,
-            )
-        return
-
-    total_links = len(set(PRODUCT_HREF_RE.findall(html)))
-    matches = find_products(html, pattern)
-    print(f"  {total_links} produktlinks på siden, {len(matches)} matcher mønsteret")
-
-    # Nul produktlinks overhovedet betyder at siden ikke blev læst som forventet
-    # (JavaScript-renderet, bot-blokeret, omlagt). Det er ikke det samme som
-    # "ingen booster bundles", og må ikke passere i stilhed.
-    if total_links == 0:
-        if should_send_diagnostic(entry, now):
-            entry["last_diagnostic"] = now.isoformat()
-            notify(
-                f"Overvågning kan ikke aflæse: {name}",
-                "Siden blev hentet, men der blev ikke fundet ét eneste produktlink. "
-                "Listen bliver sandsynligvis bygget af JavaScript, eller siden er "
-                "lagt om. Overvågningen skal justeres.",
-                priority=2, tags=["warning"], click=url, dry_run=dry_run,
-            )
-        return
-
-    entry["products_seen"] = total_links
-    for product in matches:
-        product_id = product["id"]
-        known_entry = known.get(product_id)
-        if known_entry is None:
-            known[product_id] = {"name": product["name"], "first_seen": now.isoformat()}
-            notify(
-                f"BOOSTER BUNDLE: {product['name']}",
-                f"Nyt produkt dukket op på {name}.\n\n{url}",
+                f"BOOSTER BUNDLE FUNDET: {label.title()}",
+                f"Ny vare i katalog: {label}.\n\nDen er nu også lagerovervåget."
+                f"\n\n{url}",
                 priority=5, tags=["package", "tada"], click=url,
                 image=target.get("image") or fallback_image, dry_run=dry_run,
             )
-            print(f"  NY: {product['id']} {product['name']}")
-        else:
-            known_entry.setdefault("name", product["name"])
-            print(f"  kendt: {product['id']} {product['name']}")
+
+    entry["last_run"] = now.isoformat()
+    entry["products_scanned"] = total
+    print(f"  {len(known)} kendte match, {total} produkter gennemgået")
 
 
 # --------------------------------------------------------------------------
@@ -659,9 +634,18 @@ def main() -> int:
             print(f"  uventet fejl: {type(exc).__name__}: {exc}", file=sys.stderr)
         print()
 
-    for target in targets.get("listings", []):
+    # Varer opdaget via sitemap følges på lige fod med de konfigurerede.
+    for url, info in sorted(state.get("watched_products", {}).items()):
+        target = {"key": f"fundet:{url}", "name": info.get("name", url), "url": url}
         try:
-            check_listing(target, state, now, args.dry_run, fallback_image)
+            check_product(target, state, now, args.dry_run, fallback_image)
+        except Exception as exc:
+            print(f"  uventet fejl: {type(exc).__name__}: {exc}", file=sys.stderr)
+        print()
+
+    for target in targets.get("discovery", []):
+        try:
+            check_discovery(target, state, now, args.dry_run, fallback_image)
         except Exception as exc:
             print(f"  uventet fejl: {type(exc).__name__}: {exc}", file=sys.stderr)
         print()
