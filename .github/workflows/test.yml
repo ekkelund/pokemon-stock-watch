@@ -1,0 +1,14 @@
+name: Tests
+
+on:
+  push:
+    paths: ['watcher/**', '.github/workflows/**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 watcher/test_check.py

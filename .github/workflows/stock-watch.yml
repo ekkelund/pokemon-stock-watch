@@ -1,0 +1,71 @@
+name: Lagerovervågning
+
+on:
+  schedule:
+    # Cron i GitHub Actions kører kun i UTC og kender ikke dansk sommertid.
+    # Derfor fyrer vi hvert 30. minut hele døgnet og lader check.py afgøre,
+    # ud fra Europe/Copenhagen, om slottet skal tjekkes: dag (06-20) begge
+    # slots, nat kun toppen af timen. Det rammer rigtigt både sommer og vinter.
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Tjek selv om vi er uden for tidsvinduet'
+        type: boolean
+        default: true
+      dry_run:
+        description: 'Skriv notifikationer til loggen i stedet for at sende dem'
+        type: boolean
+        default: false
+
+# Overlappende kørsler ville kunne skrive state.json oven i hinanden og
+# udløse dubletnotifikationer. En ny kørsel venter i stedet.
+concurrency:
+  group: stock-watch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Kør tjek
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_SERVER: ${{ vars.NTFY_SERVER || 'https://ntfy.sh' }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+        run: |
+          if [ -z "$NTFY_TOPIC" ]; then
+            echo "::error::NTFY_TOPIC-secret mangler. Uden den sendes der ingen notifikationer."
+            exit 1
+          fi
+          python3 watcher/check.py \
+            ${{ inputs.force && '--force' || '' }} \
+            ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Gem state
+        if: ${{ !inputs.dry_run }}
+        run: |
+          if git diff --quiet -- watcher/state.json; then
+            echo "Ingen ændringer i state."
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add watcher/state.json
+          git commit -m "state: lagerstatus opdateret $(date -u +%Y-%m-%dT%H:%MZ)"
+          # Kørsler kan overlappe med en manuel dispatch, så vi rebaser hvis
+          # fjern-grenen har flyttet sig i mellemtiden.
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "Push fejlede (forsøg $attempt), henter og prøver igen"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+            sleep $((attempt * 3))
+          done
+          echo "::warning::Kunne ikke gemme state. Næste kørsel kan gentage en notifikation."
