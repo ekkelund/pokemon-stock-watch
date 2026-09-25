@@ -50,19 +50,19 @@
   ],
   "discovery": [
     {
-      "key": "booster-bundle",
-      "name": "Pokemon booster",
+      "key": "pokemon-30th",
+      "name": "Pokemon 30th",
       "_om_match": [
-        "Maalt mod alle fem kataloger 2026-09-25 foer den blev sat i drift.",
-        "Fanger: alle Pokemon-boostere, samt bundles og bokse fra ethvert maerke.",
-        "Fanger ikke: booster-varer fra andre maerker uden bundle eller box, fordi",
-        "  br og foetex har snesevis af Panini- og Topps-boostere der ellers ville",
-        "  larme; og hudpleje og haarserum, som salling.dk har hundredvis af.",
-        "exclude fjerner tilbehoer: en akrylkasse TIL en booster box hedder selv",
-        "  booster box i slug'en og ville ellers udloese alarm."
+        "Maalt mod katalogerne 2026-09-25 foer den blev sat i drift.",
+        "Kraever BAADE pokemon OG et 30th-maerke i varens slug.",
+        "Et bart 30th-moenster gav 15 traef hos foetex, hvoraf kun 5 var Pokemon:",
+        "  resten var LEGO Ninjago 15-aars jubilaeum, Tamagotchi 30-aars,",
+        "  Rayman 30th Anniversary til PS5 og Switch, Kandis 35-aars",
+        "  jubilaeumsalbum og Paw Patrol celebration.",
+        "Omvendt ville et bart pokemon-moenster fange hvert eneste loese",
+        "  boosterbrev og hver t-shirt. Begge led skal vaere der."
       ],
-      "match": "pokemon.*booster|booster.{0,15}(bundle|box)",
-      "exclude": "akrylkasse|binder|sleeve|etui|opbevaring|toploader|kasse til|holder",
+      "match": "(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))",
       "sites": [
         "https://www.bilka.dk",
         "https://www.br.dk",

@@ -642,7 +642,8 @@ def sitemap_product_urls(site: str):
 
 
 def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
-                    fallback_image: str | None = None) -> None:
+                    fallback_image: str | None = None,
+                    already_watched: set | None = None) -> None:
     """Opdag nye varer der matcher et mønster, via sitemap.
 
     Listesiderne bygges af JavaScript og kan ikke læses uden en browser.
@@ -673,6 +674,10 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
             pass
 
     watched = state.setdefault("watched_products", {})
+    # Elite Trainer Box'en står allerede som fast mål og matcher også
+    # 30th-mønsteret. Uden dette ville den blive opdaget som ny og derefter
+    # tjekket to gange, med dobbelte notifikationer den dag den lander.
+    configured = already_watched or set()
     total = 0
     for site in target["sites"]:
         urls, error = sitemap_product_urls(site)
@@ -700,7 +705,7 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
         print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher{note}")
 
         for url in matches:
-            if url in known:
+            if url in known or url in configured:
                 continue
             label = product_slug(url).replace("-", " ") or url
             known[url] = {"first_seen": now.isoformat(), "name": label}
@@ -829,9 +834,11 @@ def main() -> int:
             print(f"  uventet fejl: {type(exc).__name__}: {exc}", file=sys.stderr)
         print()
 
+    configured_urls = {t["url"] for t in targets.get("products", [])}
     for target in targets.get("discovery", []):
         try:
-            check_discovery(target, state, now, args.dry_run, fallback_image)
+            check_discovery(target, state, now, args.dry_run, fallback_image,
+                            configured_urls)
         except Exception as exc:
             print(f"  uventet fejl: {type(exc).__name__}: {exc}", file=sys.stderr)
         print()

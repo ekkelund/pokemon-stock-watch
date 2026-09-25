@@ -10,30 +10,33 @@ stå en maskine tændt derhjemme.
 når varen skifter fra utilgængelig til på lager. Alle tre sider tjekkes, fordi
 Salling ikke nødvendigvis frigiver lager samtidig på dem.
 
-**Pokémon-boostere** opdages via sitemap. Notifikation når en ny vare dukker op
-i kataloget, og varen lægges derefter automatisk i lagerovervågning, så du også
-får besked når den kan købes.
+**Pokémon 30th** opdages via sitemap. Notifikation når en ny 30th-vare dukker
+op i kataloget, og varen lægges derefter automatisk i lagerovervågning, så du
+også får besked når den kan købes.
 
-Mønsteret er `pokemon.*booster|booster.{0,15}(bundle|box)` med frasortering af
-`akrylkasse|binder|sleeve|etui|opbevaring|toploader|kasse til|holder`. Det blev
-målt mod alle fem kataloger inden det blev sat i drift, fordi et for bredt
-mønster koster mere end det smager: falske alarmer lærer en at ignorere
-notifikationerne, og så tier overvågningen den dag den har ret.
+Mønsteret kræver **både** `pokemon` og et 30th-mærke i varens slug:
 
-Hvad målingen viste:
+```
+(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))
+```
 
-| Vare | Resultat |
+Begge led er nødvendige, og det blev målt frem for gættet. Et bart
+30th-mønster gav 15 træf hos føtex, hvoraf kun 5 var Pokémon:
+
+| Fanges | Frasorteres |
 |---|---|
-| `pokemon-pitch-black-checklane-booster-pack` | fanget |
-| `shieldbinder-akrylkasse-til-booster-box` | frasorteret som tilbehør |
-| `topps-match-attax-champions-league-booster-tin` | ignoreret, andet mærke |
-| `panini-hot-wheel-samlekort-booster-pakke` | ignoreret, andet mærke |
-| `the-6-peptide-skin-booster-serum-150-ml` | ignoreret, hudpleje |
-| `titaniumbaby-boosterseat-finn-125-150-cm` | ignoreret, autostol |
+| `pokemon-elite-trainer-box-30th-samlekort` | `lego-ninjago-15-aars-jubilaeum` |
+| `pokemon-sylveon-ex-box-30th` | `original-tamagotchi-30-aars-jubilaeum` |
+| `pokemon-30th-samlekort` | `switch-rayman-30th-anniversary-edition` |
+| `pokemon-poster-collection-30th` | `cd-kandis-35-aars-jubilaeumsalbum` |
+| `pokemon-binder-collection-30th` | `paw-patrol-all-paws-celebration-gaveaeske` |
 
-salling.dk's 129.010 varer gav nul falske træf.
+Omvendt ville et bart `pokemon`-mønster fange hvert eneste løse boosterbrev og
+hver Pokémon-t-shirt hos salling.dk.
 
-Mål redigeres i `watcher/targets.json`.
+Varer der allerede står som faste mål under `products` springes over i
+opdagelsen. Ellers ville Elite Trainer Box'en, som selv matcher mønsteret,
+blive tjekket to gange og udløse dobbelte notifikationer den dag den lander.
 
 ### De fem sites
 
