@@ -665,7 +665,11 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
     # Tilbehør bærer varens navn: en akrylkasse til en booster box hedder
     # "booster box" i slug'en. Uden frasortering ville hver opbevaringsæske
     # udløse alarm, og falske alarmer lærer en at ignorere de ægte.
+    # To slags fravalg. exclude rammer varetyper man aldrig vil have, og
+    # virker også på varer der først dukker op senere. ignore_ids rammer
+    # enkeltvarer man har set og sagt nej til.
     exclude = re.compile(target["exclude"], re.IGNORECASE) if target.get("exclude") else None
+    ignore_ids = set(target.get("ignore_ids", []))
     entry = state.setdefault(key, {})
     known = entry.setdefault("known_products", {})
     print(f"[opdagelse] {name}")
@@ -705,13 +709,22 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
                 )
             continue
         total += len(urls)
-        matches = [u for u in urls
-                   if pattern.search(product_slug(u).replace("-", " "))
-                   and u not in configured]
-        print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher")
+        matches, skipped = [], 0
+        for url in urls:
+            label = product_slug(url).replace("-", " ")
+            if not pattern.search(label) or url in configured:
+                continue
+            if exclude and exclude.search(label):
+                skipped += 1
+                continue
+            if url_segments(url)[-1] in ignore_ids:
+                skipped += 1
+                continue
+            matches.append(url)
+        note = f", {skipped} fravalgt" if skipped else ""
+        print(f"  {site}: {len(urls)} produkter, {len(matches)} matcher{note}")
         for url in matches:
-            product_id = url_segments(url)[-1]
-            by_product.setdefault(product_id, []).append(url)
+            by_product.setdefault(url_segments(url)[-1], []).append(url)
 
     for product_id, urls in sorted(by_product.items()):
         for url in urls:

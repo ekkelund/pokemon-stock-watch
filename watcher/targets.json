@@ -63,6 +63,14 @@
         "  boosterbrev og hver t-shirt. Begge led skal vaere der."
       ],
       "match": "(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))",
+      "_om_fravalg": [
+        "exclude rammer varetyper der aldrig oenskes, ogsaa dem der foerst",
+        "  dukker op senere: plakater, mapper, album og lignende merchandise.",
+        "ignore_ids rammer enkeltvarer der er set og valgt fra:",
+        "  200392806 = Sylveon ex Box 30th."
+      ],
+      "exclude": "poster|plakat|binder|mappe|album|sleeve|etui|toploader",
+      "ignore_ids": ["200392806"],
       "sites": [
         "https://www.bilka.dk",
         "https://www.br.dk",

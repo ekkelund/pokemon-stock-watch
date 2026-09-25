@@ -295,6 +295,33 @@ class Test30thPattern(unittest.TestCase):
         ]:
             self.assertFalse(self.hit(slug), slug)
 
+    EXCLUDE = re.compile(r"poster|plakat|binder|mappe|album|sleeve|etui|toploader",
+                         re.IGNORECASE)
+    IGNORE_IDS = {"200392806"}
+
+    def wanted(self, slug, product_id=""):
+        label = slug.replace("-", " ")
+        return (bool(self.MATCH.search(label))
+                and not self.EXCLUDE.search(label)
+                and product_id not in self.IGNORE_IDS)
+
+    def test_merchandise_is_excluded(self):
+        # Rigtige 30th-varer, men plakater og mapper er ikke det vi jagter.
+        self.assertTrue(self.MATCH.search("pokemon poster collection 30th"))
+        self.assertFalse(self.wanted("pokemon-poster-collection-30th", "200392205"))
+        self.assertFalse(self.wanted("pokemon-binder-collection-30th", "200392204"))
+
+    def test_single_product_can_be_ignored_by_id(self):
+        # Sylveon-boksen er hverken merchandise eller forkert navngivet; den er
+        # bare valgt fra. Derfor et vare-nummer og ikke et moenster.
+        self.assertTrue(self.MATCH.search("pokemon sylveon ex box 30th"))
+        self.assertFalse(self.wanted("pokemon-sylveon-ex-box-30th", "200392806"))
+
+    def test_the_ones_we_want_survive_both_filters(self):
+        self.assertTrue(self.wanted("pokemon-elite-trainer-box-30th-samlekort",
+                                    "200392202"))
+        self.assertTrue(self.wanted("pokemon-30th-samlekort", "200392214"))
+
     def test_pokemon_without_30th_is_ignored(self):
         # Fundet af det tidligere, for brede mønster. Ægte Pokémon-varer, men
         # ikke 30th, og derfor ikke det vi jagter.
