@@ -73,6 +73,32 @@ class TestStatus(unittest.TestCase):
         self.assertEqual(status, IN_STOCK)
         self.assertEqual(method, "json-ld")
 
+    def test_any_available_variant_means_in_stock(self):
+        # salling.dk har en offer pr. størrelse. Er én på lager, kan varen
+        # købes, selv om de første i listen er udsolgt.
+        html = page('''<script type="application/ld+json">
+        {"@type":"Product","name":"T-shirt","offers":[
+          {"@type":"Offer","availability":"https://schema.org/OutOfStock"},
+          {"@type":"Offer","availability":"https://schema.org/LimitedAvailability"}]}
+        </script>''')
+        status, method, evidence = detect_status(html)
+        self.assertEqual(status, IN_STOCK)
+        self.assertEqual(method, "json-ld")
+        self.assertIn("2 varianter", evidence)
+
+    def test_all_variants_sold_out(self):
+        html = page('''<script type="application/ld+json">
+        {"@type":"Product","offers":[
+          {"@type":"Offer","availability":"https://schema.org/OutOfStock"},
+          {"@type":"Offer","availability":"https://schema.org/SoldOut"}]}
+        </script>''')
+        self.assertEqual(detect_status(html)[0], OUT_OF_STOCK)
+
+    def test_limited_availability_counts_as_in_stock(self):
+        html = page('''<script type="application/ld+json">{"@type":"Product",
+        "offers":{"availability":"https://schema.org/LimitedAvailability"}}</script>''')
+        self.assertEqual(detect_status(html)[0], IN_STOCK)
+
     def test_ldjson_out_of_stock(self):
         self.assertEqual(detect_status(LDJSON_OUT)[0], OUT_OF_STOCK)
 

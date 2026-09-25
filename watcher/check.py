@@ -289,14 +289,28 @@ def normalise_availability(value: str):
 
 
 def status_from_ldjson(html: str):
+    """Lagerstatus fra schema.org offers.availability.
+
+    offers er ofte en liste med én post pr. variant: salling.dk har en offer
+    pr. størrelse. Én tilgængelig variant betyder at varen kan købes, så vi
+    ser på dem alle frem for kun den første. Ellers ville en udsolgt str. S
+    skjule en str. M på lager.
+    """
+    found = []
     for entry in parse_ld_json(html):
         for path, key, value in walk_json(entry):
             if key.lower() != "availability":
                 continue
             status = normalise_availability(value)
             if status:
-                return status, "json-ld", f"{path} = {value}"
-    return None
+                found.append((status, f"{path} = {value}"))
+    if not found:
+        return None
+    for status, evidence in found:
+        if status == IN_STOCK:
+            extra = f" (1 af {len(found)} varianter)" if len(found) > 1 else ""
+            return IN_STOCK, "json-ld", evidence + extra
+    return OUT_OF_STOCK, "json-ld", found[0][1]
 
 
 def status_from_embedded_json(html: str):
