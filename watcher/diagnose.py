@@ -12,7 +12,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check import (  # noqa: E402
-    NEXT_F_RE, PRODUCT_HREF_RE, http_get, parse_ld_json, parse_next_data,
+    NEXT_F_RE, PRODUCT_HREF_RE, detect_image, detect_status, http_get,
+    parse_ld_json, parse_next_data, visible_text,
 )
 
 SCRIPT_SRC_RE = re.compile(r'<script\b[^>]*\bsrc=["\']([^"\']+)["\']', re.IGNORECASE)
@@ -28,6 +29,21 @@ def summarise(url: str) -> None:
         print(f"HENTNING MISLYKKEDES: {error}\n")
         return
     print(f"længde: {len(html)} tegn")
+
+    # Det vigtigste tal: hvad ville overvågningen konkludere om denne side?
+    status, method, evidence = detect_status(html)
+    print(f"LAGERSTATUS: {status}  (metode: {method})")
+    print(f"  belæg: {evidence[:220]}")
+    print(f"  billede: {detect_image(html, url)}")
+
+    # Hvilke danske vendinger findes overhovedet? Uden dem har tekstmetoden,
+    # som er sidste udvej, intet at arbejde med.
+    text = visible_text(html).lower()
+    signals = [w for w in ("udsolgt", "ikke på lager", "på lager", "læg i kurv",
+                           "tilføj til kurv", "køb", "forventet", "restordre",
+                           "på vej", "giv besked", "udgået", "lagerstatus")
+               if w in text]
+    print(f"  danske signalord fundet: {signals}")
 
     links = sorted(set(PRODUCT_HREF_RE.findall(html)))
     print(f"/produkter/-links i rå HTML: {len(links)}")
