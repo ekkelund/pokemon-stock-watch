@@ -691,6 +691,20 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
     known = entry.setdefault("known_products", {})
     print(f"[opdagelse] {name}")
 
+    # Aendres butikslisten eller moensteret, er den forrige koersel ikke
+    # laengere daekkende, og grænsen maa ikke staa i vejen. Uden dette ville
+    # en nytilfoejet butik foerst blive gennemsoegt op til elleve timer senere,
+    # hvilket er nemt at tage for at butikken ingenting har.
+    fingerprint = json.dumps(
+        [sorted(target["sites"]), target["match"], target.get("exclude"),
+         sorted(target.get("ignore_ids", []))],
+        ensure_ascii=False, sort_keys=True)
+    if entry.get("config") != fingerprint:
+        if entry.get("config") is not None:
+            print("  opsætningen er ændret, grænsen springes over")
+        entry["config"] = fingerprint
+        entry.pop("last_run", None)
+
     last = entry.get("last_run")
     if last and not target.get("always"):
         try:
