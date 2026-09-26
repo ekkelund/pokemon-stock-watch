@@ -1,5 +1,5 @@
 {
-  "_heartbeat": "2026-09-25",
+  "_heartbeat": "2026-09-26",
   "etb30-bilka": {
     "method": "json-ld",
     "status": "out_of_stock",
@@ -14,6 +14,21 @@
     "method": "json-ld",
     "status": "out_of_stock",
     "url": "https://www.foetex.dk/produkter/pokemon-elite-trainer-box-30th-samlekort/200392202/"
+  },
+  "fundet:https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/"
+  },
+  "fundet:https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/"
+  },
+  "fundet:https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
   "pokemon-30th": {
     "known_products": {
