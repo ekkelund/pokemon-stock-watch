@@ -54,6 +54,12 @@
     "  netto - ingen webshop. Sitemappet rummer 686 sider, naesten alle",
     "    butiksadresser og opskrifter, nul varer. Medtaget som billig",
     "    snubletraad hvis Netto nogensinde aabner en shop.",
+    "  coolshop - ikke Salling Group, helt egen platform. 83.289 varer, og de",
+    "    har 30th-varer som ingen af de andre foerer. Deres varenumre er tal",
+    "    efterfulgt af bogstaver (23Y9X4), hvilket kraevede at id-genkendelsen",
+    "    blev gjort bredere. De udsender kun schema.org Product naar varen ER",
+    "    paa lager; er den udsolgt, udelades blokken og teksten laeses i stedet.",
+    "    Overgangen til paa lager fanges dermed af den staerkeste metode.",
     "Der matches paa varens slug alene, ikke paa hele URL'en: salling.dk har",
     "hundredvis af hudpleje-varer med booster i kategoristien."
   ],
@@ -85,7 +91,8 @@
         "https://www.br.dk",
         "https://www.foetex.dk",
         "https://salling.dk",
-        "https://netto.dk"
+        "https://netto.dk",
+        "https://www.coolshop.dk"
       ]
     }
   ]

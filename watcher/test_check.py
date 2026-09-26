@@ -125,6 +125,35 @@ class TestStatus(unittest.TestCase):
     def test_text_in(self):
         self.assertEqual(detect_status(TEXT_IN_PAGE)[0], IN_STOCK)
 
+    def test_coolshop_pattern_in_stock_uses_strongest_method(self):
+        """Coolshop udsender kun Product naar varen ER paa lager.
+
+        Maalt 26. september 2026: en vare paa lager gav json-ld/InStock, mens
+        en udsolgt vare slet ikke havde nogen Product-blok og maatte laeses
+        som tekst. Overgangen til paa lager, den eneste der udloeser en
+        notifikation, fanges altsaa af den staerkeste metode.
+        """
+        in_stock = page('''<script type="application/ld+json">
+        {"@type":"Product","name":"Pokemon XXL Eraser",
+         "offers":{"availability":"https://schema.org/InStock"}}</script>
+        <div>Laeg i kurv</div>''')
+        status, method, _ = detect_status(in_stock)
+        self.assertEqual(status, IN_STOCK)
+        self.assertEqual(method, "json-ld")
+
+    def test_coolshop_pattern_out_of_stock_falls_to_text(self):
+        # Ingen Product-blok, kun WebPage og Organization. Saadan ser en
+        # udsolgt Coolshop-vare ud.
+        out = page('''<script type="application/ld+json">
+        {"@type":"WebPage","name":"Pokemon 30th Celebration"}</script>
+        <script type="application/ld+json">
+        {"@type":"Organization","name":"Coolshop"}</script>
+        <div>Ikke paa lager</div><div>Ikke på lager</div>''')
+        status, method, evidence = detect_status(out)
+        self.assertEqual(status, OUT_OF_STOCK)
+        self.assertEqual(method, "text")
+        self.assertEqual(evidence, "ikke på lager")
+
     def test_opaque_page_is_unknown_not_out_of_stock(self):
         # Det vigtigste enkeltkrav: en side vi ikke forstår må aldrig blive
         # læst som "udsolgt", for så ville vi aldrig notificere igen.

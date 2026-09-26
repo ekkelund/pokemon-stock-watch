@@ -51,6 +51,7 @@ Koncernen har fem webadresser, men de er ikke ens. Målt 25. september 2026:
 | br.dk | 16.848 | ja | ja |
 | salling.dk | 261.768 | nej | ja, som beredskab |
 | netto.dk | 0 | nej | ja, som snubletråd |
+| coolshop.dk | 83.289 | ja | ja |
 
 De tre første er der hvor det sker. De har samlekort, kender vare 200392202,
 og kører den Nuxt-platform hvor produktsider leverer schema.org JSON-LD.
@@ -65,7 +66,27 @@ butiksadresser og 43 er opskrifter. Nul varer. Det er taget med som en billig
 snubletråd: skulle Netto åbne en shop, dukker varerne op i sitemappet, og så
 fanger overvågningen det. Det koster 686 URLer hver 11. time, altså intet.
 
-Fordi de to platforme har forskellige URL-former, matches der på varens **slug
+**coolshop.dk er ikke Salling Group** og kører sin egen platform. Den er værd
+at have med: de fører 30th-varer som ingen af de andre har.
+
+To ting måtte måles der. Deres varenumre er tal efterfulgt af bogstaver
+(`23Y9X4`), og id-genkendelsen krævede rene tal. Uden den rettelse ville alle
+83.289 varer være blevet afvist, og overvågningen ville have meldt "0 varer"
+uden at fejle, hvilket ligner en butik der ikke har noget.
+
+Og deres lageraflæsning virker modsat af hvad man tror. De udsender **kun**
+schema.org `Product` når varen **er** på lager; er den udsolgt, udelades
+blokken helt og teksten må læses i stedet. Målt 26. september:
+
+```
+in_stock      json-ld   pokemon-xxl-eraser             availability = InStock
+out_of_stock  text      pokemon-30th-celebration-...   "ikke på lager"
+```
+
+Det er heldigvis den rigtige vej rundt. Overgangen til på lager, den eneste
+der udløser en notifikation, fanges af den stærkeste metode i kaskaden.
+
+Fordi platformene har forskellige URL-former, matches der på varens **slug
 alene** og ikke på hele URL'en:
 
 ```
