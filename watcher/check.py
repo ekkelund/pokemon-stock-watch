@@ -564,16 +564,24 @@ def looks_like_id(segment: str) -> bool:
     Butikkerne skriver id'et forskelligt:
         bilka, br, foetex   200392202   rene tal
         salling             p-1180431   med præfiks
-        coolshop            23456T      tal efterfulgt af bogstaver
+        coolshop            23Y9X4      korte koder med store bogstaver
 
-    Fællesnævneren er ét ord uden bindestreger med mindst fire cifre. Et
-    produktnavn har næsten altid bindestreger, og de få der ikke har, har
-    ikke fire cifre. Reglen blev oprindeligt skrevet som "rene tal", og så
-    læste den hele Coolshops katalog forkert: varenummeret blev opfattet som
-    produktnavnet, og ingen varer kunne genkendes.
+    Reglen hviler på to ting et produktnavn ikke har: ingen bindestreger, og
+    enten lutter cifre eller mindst ét stort bogstav. Slugs skrives i praksis
+    altid med små bogstaver og bindestreger, så de store bogstaver er et
+    stærkt signal.
+
+    Reglen har været for snæver to gange. Først krævede den rene tal, hvilket
+    afviste hele Coolshops katalog. Derefter krævede den fire cifre, hvilket
+    stadig afviste tre fjerdedele af det: koder som 9M9L6N har kun tre. Begge
+    gange var symptomet det samme, en butik der så tom ud, og det er netop
+    den fejl der er svær at få øje på.
     """
     core = segment[2:] if segment.startswith("p-") else segment
-    return core.isalnum() and sum(c.isdigit() for c in core) >= 4
+    if not core.isalnum() or len(core) < 4 or not any(c.isdigit() for c in core):
+        return False
+    return core.isdigit() or any(c.isupper() for c in core)
+
 
 # Sitemappene fylder flere megabyte. De hentes derfor sjældent: de er en
 # opdagelsesmekanisme, ikke en lagermåling, og nye varer dukker alligevel først

@@ -269,18 +269,22 @@ class TestUrlShapes(unittest.TestCase):
         self.assertTrue(is_product_url(self.SALLING))
         self.assertTrue(is_product_url(self.COOLSHOP))
 
-    def test_coolshop_id_with_letters(self):
-        # Coolshops varenumre er tal efterfulgt af bogstaver. En regel der kun
-        # accepterede rene tal laeste hele deres katalog forkert: varenummeret
-        # blev opfattet som produktnavnet.
-        self.assertTrue(looks_like_id("23456T"))
+    def test_coolshop_ids_of_all_shapes(self):
+        # Coolshop-koder varierer i antal cifre. En regel der kraevede fire
+        # cifre afviste tre fjerdedele af deres katalog, og symptomet var en
+        # butik der saa tom ud.
+        for code in ["23456T", "23Y9X4", "23YB57", "23Z4A6", "9M9L6N", "2ABC3D"]:
+            self.assertTrue(looks_like_id(code), code)
         self.assertTrue(looks_like_id("200392202"))
         self.assertTrue(looks_like_id("p-1180431"))
         self.assertEqual(product_slug(self.COOLSHOP),
                          "pokemon-elite-trainer-box-30th")
 
     def test_names_are_not_mistaken_for_ids(self):
-        for word in ["30th", "samlekort", "pokemon", "pl", "c", "produkter"]:
+        # Slugs skrives med smaa bogstaver og bindestreger. Ingen af dem har
+        # baade ingen bindestreger og et stort bogstav eller lutter cifre.
+        for word in ["30th", "samlekort", "pokemon", "pl", "c", "produkter",
+                     "pokemon-30th-samlekort", "boern", "sylveon", "tin2"]:
             self.assertFalse(looks_like_id(word), word)
 
     def test_rejects_non_product_urls(self):
