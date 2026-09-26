@@ -676,7 +676,8 @@ def sitemap_product_urls(site: str):
 
 def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
                     fallback_image: str | None = None,
-                    already_watched: set | None = None) -> None:
+                    already_watched: set | None = None,
+                    force: bool = False) -> None:
     """Opdag nye varer der matcher et mønster, via sitemap.
 
     Listesiderne bygges af JavaScript og kan ikke læses uden en browser.
@@ -714,6 +715,9 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
         entry.pop("last_run", None)
 
     last = entry.get("last_run")
+    if last and force:
+        print("  gennemtvunget, grænsen springes over")
+        last = None
     if last and not target.get("always"):
         try:
             elapsed = now - datetime.fromisoformat(last)
@@ -819,6 +823,10 @@ def main() -> int:
                         help="skriv notifikationer til konsollen i stedet for ntfy")
     parser.add_argument("--probe", metavar="URL",
                         help="hent én URL og udskriv hvad kaskaden finder")
+    parser.add_argument("--rediscover", action="store_true",
+                        help="gennemsøg sitemaps nu, uanset 11-timers-grænsen. "
+                             "Opsætningsændringer klarer sig selv; dette er til "
+                             "når koden bag opdagelsen er ændret")
     parser.add_argument("--test-notify", action="store_true",
                         help="send én testbesked og afslut, uden at røre state")
     args = parser.parse_args()
@@ -930,7 +938,7 @@ def main() -> int:
     for target in targets.get("discovery", []):
         try:
             check_discovery(target, state, now, args.dry_run, fallback_image,
-                            configured_urls)
+                            configured_urls, args.rediscover)
         except Exception as exc:
             print(f"  uventet fejl: {type(exc).__name__}: {exc}", file=sys.stderr)
         print()

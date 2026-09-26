@@ -21,6 +21,10 @@ on:
         description: 'Send kun en testbesked til ntfy og afslut'
         type: boolean
         default: false
+      rediscover:
+        description: 'Gennemsøg sitemaps nu, uanset 11-timers-grænsen'
+        type: boolean
+        default: false
 
 # Overlappende kørsler ville kunne skrive state.json oven i hinanden og
 # udløse dubletnotifikationer. En ny kørsel venter i stedet.
@@ -54,7 +58,8 @@ jobs:
           python3 watcher/check.py \
             ${{ inputs.force && '--force' || '' }} \
             ${{ inputs.dry_run && '--dry-run' || '' }} \
-            ${{ inputs.test_notify && '--test-notify' || '' }}
+            ${{ inputs.test_notify && '--test-notify' || '' }} \
+            ${{ inputs.rediscover && '--rediscover' || '' }}
 
       - name: Gem state
         if: ${{ !inputs.dry_run }}
