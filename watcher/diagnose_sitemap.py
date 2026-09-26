@@ -127,6 +127,7 @@ for base in (args or DEFAULT_SITES):
         print(f"  MØNSTER {try_match!r}: {len(hits)} træf")
         for u in kept:
             print(f"      BEHOLDT  {slug(u)}")
+            print(f"               {u}")
         for u in dropped:
             print(f"      FRASORT. {slug(u)}")
     else:
