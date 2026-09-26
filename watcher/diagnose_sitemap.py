@@ -103,6 +103,15 @@ for base in (args or DEFAULT_SITES):
     for k in known[:2]:
         print(f"      {k}")
 
+    # Vis URL-formen og hvad slug-udtrækningen får ud af den. Uden det kan
+    # nul træf lige så godt betyde "forkert aflæst" som "findes ikke".
+    print("\n  eksempler paa produkt-URLer og udtrukket slug:")
+    for u in all_products[:5]:
+        parts = [x for x in u.split("/")[3:] if x]
+        guess = parts[-2] if len(parts) > 1 and re.match(r"^(?:p-)?\d{4,}$", parts[-1]) else (parts[-1] if parts else "")
+        print(f"      {u}")
+        print(f"        sidste led: {parts[-1] if parts else ''!r}   slug bliver: {guess!r}")
+
     if try_match:
         # Der matches på slug'en alene, præcis som overvågningen gør.
         def slug(url):
