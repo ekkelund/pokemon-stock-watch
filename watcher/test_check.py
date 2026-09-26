@@ -14,7 +14,8 @@ sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from check import (  # noqa: E402
     IN_STOCK, OUT_OF_STOCK, UNKNOWN,
     LOC_RE, PRODUCT_HREF_RE, detect_image, detect_status, is_product_url,
-    pretty_name, product_slug, shop_name, slot_is_active, visible_text,
+    looks_like_id, pretty_name, product_slug, shop_name, slot_is_active,
+    visible_text,
 )
 from datetime import datetime  # noqa: E402
 
@@ -226,6 +227,8 @@ class TestUrlShapes(unittest.TestCase):
     """
 
     BILKA = "https://www.bilka.dk/produkter/pokemon-booster-bundle-mega/200555666/"
+    COOLSHOP = ("https://www.coolshop.dk/produkt/"
+                "pokemon-elite-trainer-box-30th/23456T/")
     SALLING = ("https://salling.dk/boern/toej/t-shirts/"
                "mile-pokemon-t-shirt-bright-white-116-cm/p-1180431/")
     SALLING_BEAUTY = ("https://salling.dk/skoenhed/haar/haarpleje/"
@@ -235,6 +238,21 @@ class TestUrlShapes(unittest.TestCase):
     def test_recognises_product_urls(self):
         self.assertTrue(is_product_url(self.BILKA))
         self.assertTrue(is_product_url(self.SALLING))
+        self.assertTrue(is_product_url(self.COOLSHOP))
+
+    def test_coolshop_id_with_letters(self):
+        # Coolshops varenumre er tal efterfulgt af bogstaver. En regel der kun
+        # accepterede rene tal laeste hele deres katalog forkert: varenummeret
+        # blev opfattet som produktnavnet.
+        self.assertTrue(looks_like_id("23456T"))
+        self.assertTrue(looks_like_id("200392202"))
+        self.assertTrue(looks_like_id("p-1180431"))
+        self.assertEqual(product_slug(self.COOLSHOP),
+                         "pokemon-elite-trainer-box-30th")
+
+    def test_names_are_not_mistaken_for_ids(self):
+        for word in ["30th", "samlekort", "pokemon", "pl", "c", "produkter"]:
+            self.assertFalse(looks_like_id(word), word)
 
     def test_rejects_non_product_urls(self):
         self.assertFalse(is_product_url(self.NETTO))

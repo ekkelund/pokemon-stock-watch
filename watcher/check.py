@@ -558,11 +558,22 @@ def check_product(target: dict, state: dict, now: datetime, dry_run: bool,
 LOC_RE = re.compile(r"<loc>([^<]+)</loc>")
 ROBOTS_SITEMAP_RE = re.compile(r"(?im)^\s*Sitemap:\s*(\S+)")
 
-# Sidste sti-segment på en produktside er varens id. Bilka, BR og føtex bruger
-# rene tal (/produkter/<slug>/200392202/), salling.dk bruger p-foran
-# (/boern/toej/<slug>/p-1180431/). Segmentet før er i begge tilfælde slug'en,
-# altså et læsbart produktnavn.
-ID_SEGMENT_RE = re.compile(r"^(?:p-)?\d{4,}$")
+def looks_like_id(segment: str) -> bool:
+    """Er sti-segmentet et vare-id frem for et navn?
+
+    Butikkerne skriver id'et forskelligt:
+        bilka, br, foetex   200392202   rene tal
+        salling             p-1180431   med præfiks
+        coolshop            23456T      tal efterfulgt af bogstaver
+
+    Fællesnævneren er ét ord uden bindestreger med mindst fire cifre. Et
+    produktnavn har næsten altid bindestreger, og de få der ikke har, har
+    ikke fire cifre. Reglen blev oprindeligt skrevet som "rene tal", og så
+    læste den hele Coolshops katalog forkert: varenummeret blev opfattet som
+    produktnavnet, og ingen varer kunne genkendes.
+    """
+    core = segment[2:] if segment.startswith("p-") else segment
+    return core.isalnum() and sum(c.isdigit() for c in core) >= 4
 
 # Sitemappene fylder flere megabyte. De hentes derfor sjældent: de er en
 # opdagelsesmekanisme, ikke en lagermåling, og nye varer dukker alligevel først
@@ -577,7 +588,7 @@ def url_segments(url: str):
 def is_product_url(url: str) -> bool:
     """Peger URL'en på en vare frem for en kategori- eller indholdsside?"""
     parts = url_segments(url)
-    return bool(parts) and bool(ID_SEGMENT_RE.match(parts[-1]))
+    return bool(parts) and looks_like_id(parts[-1])
 
 
 def shop_name(url: str) -> str:
@@ -604,7 +615,7 @@ def product_slug(url: str) -> str:
     parts = url_segments(url)
     if not parts:
         return ""
-    if ID_SEGMENT_RE.match(parts[-1]) and len(parts) > 1:
+    if looks_like_id(parts[-1]) and len(parts) > 1:
         return parts[-2]
     return parts[-1]
 

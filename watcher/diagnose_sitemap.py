@@ -10,7 +10,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check import http_get  # noqa: E402
+from check import (  # noqa: E402
+    http_get, is_product_url, looks_like_id, product_slug,
+)
 
 DEFAULT_SITES = ["https://www.bilka.dk", "https://www.br.dk", "https://www.foetex.dk"]
 LOC_RE = re.compile(r"<loc>([^<]+)</loc>")
@@ -91,11 +93,11 @@ for base in (args or DEFAULT_SITES):
         segments[parts[0] if parts else "(rod)"] += 1
     print(f"\n  hyppigste førstesegment: {segments.most_common(12)}")
 
-    all_products = [l for l in all_urls if "/produkter/" in l or "/produkt/" in l]
-    print(f"  URLer med /produkter/ eller /produkt/: {len(all_products)}")
+    all_products = [u for u in all_urls if is_product_url(u)]
+    print(f"  genkendt som varer: {len(all_products)}")
     if not all_products:
         all_products = all_urls
-        print("  (ingen produktsti genkendt, søger i alle URLer)")
+        print("  (ingen varer genkendt, søger i alle URLer)")
 
     print(f"\n  produkter i alt: {len(all_products)}")
     known = [l for l in all_products if KNOWN_PRODUCT_ID in l]
@@ -106,19 +108,14 @@ for base in (args or DEFAULT_SITES):
     # Vis URL-formen og hvad slug-udtrækningen får ud af den. Uden det kan
     # nul træf lige så godt betyde "forkert aflæst" som "findes ikke".
     print("\n  eksempler paa produkt-URLer og udtrukket slug:")
-    for u in all_products[:5]:
-        parts = [x for x in u.split("/")[3:] if x]
-        guess = parts[-2] if len(parts) > 1 and re.match(r"^(?:p-)?\d{4,}$", parts[-1]) else (parts[-1] if parts else "")
+    for u in all_products[:4]:
         print(f"      {u}")
-        print(f"        sidste led: {parts[-1] if parts else ''!r}   slug bliver: {guess!r}")
+        print(f"        slug: {product_slug(u)!r}")
 
     if try_match:
-        # Der matches på slug'en alene, præcis som overvågningen gør.
-        def slug(url):
-            parts = [p for p in url.split("/")[3:] if p]
-            if len(parts) > 1 and re.match(r"^(?:p-)?\d{4,}$", parts[-1]):
-                return parts[-2]
-            return parts[-1] if parts else ""
+        # Samme slug-udtrækning som overvågningen bruger. En lokal kopi
+        # divergerede og fik hele Coolshops katalog til at se tomt ud.
+        slug = product_slug
 
         hits = [u for u in all_products
                 if re.search(try_match, slug(u).replace("-", " "), re.IGNORECASE)]
