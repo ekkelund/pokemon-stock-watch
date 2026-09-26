@@ -45,6 +45,16 @@ def summarise(url: str) -> None:
                if w in text]
     print(f"  danske signalord fundet: {signals}")
 
+    # Open Graphs produkt-udvidelse har et rigtigt lagerfelt. Findes det, er
+    # det langt bedre end at gætte ud fra brødteksten.
+    metas = re.findall(
+        r'<meta[^>]+(?:property|name)=["\']((?:og|product|product:item)[^"\']*)'
+        r'["\'][^>]*content=["\']([^"\']*)["\']', html, re.IGNORECASE)
+    interesting = [(k, v) for k, v in metas
+                   if any(w in k.lower() for w in
+                          ("avail", "stock", "price", "condition"))]
+    print(f"  og/product-meta om lager: {interesting}")
+
     links = sorted(set(PRODUCT_HREF_RE.findall(html)))
     print(f"/produkter/-links i rå HTML: {len(links)}")
     for slug, pid in links[:10]:
