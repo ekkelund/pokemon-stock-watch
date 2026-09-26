@@ -25,6 +25,16 @@
     "status": "out_of_stock",
     "url": "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
+    "method": "text",
+    "status": "out_of_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/"
+  },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
+    "method": "text",
+    "status": "out_of_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/"
+  },
   "fundet:https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/": {
     "method": "json-ld",
     "status": "out_of_stock",
