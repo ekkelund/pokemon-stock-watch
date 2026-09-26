@@ -20,6 +20,9 @@ SCRIPT_SRC_RE = re.compile(r'<script\b[^>]*\bsrc=["\']([^"\']+)["\']', re.IGNORE
 API_RE = re.compile(r'https?://[^\s"\'<>]*(?:api|graphql|search|/v\d)[^\s"\'<>]*', re.IGNORECASE)
 
 
+RESULTS = []
+
+
 def summarise(url: str) -> None:
     print("=" * 78)
     print(url)
@@ -32,6 +35,7 @@ def summarise(url: str) -> None:
 
     # Det vigtigste tal: hvad ville overvågningen konkludere om denne side?
     status, method, evidence = detect_status(html)
+    RESULTS.append((url, status, method, evidence))
     print(f"LAGERSTATUS: {status}  (metode: {method})")
     print(f"  belæg: {evidence[:220]}")
     print(f"  billede: {detect_image(html, url)}")
@@ -135,3 +139,12 @@ if __name__ == "__main__":
         urls = [t["url"] for t in cfg["listings"]]
     for url in urls:
         summarise(url)
+
+    # Opsummering til sidst, saa den staar i bunden af loggen og kan laeses
+    # uden at grave gennem hele udskriften.
+    print("=" * 78)
+    print("OPSUMMERING")
+    print("=" * 78)
+    for url, status, method, evidence in RESULTS:
+        print(f"  {status:<13} {method:<14} {url.rsplit('/', 3)[-3]}")
+        print(f"      belaeg: {evidence[:120]}")
