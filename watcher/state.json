@@ -51,7 +51,7 @@
     "url": "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
   "pokemon-30th": {
-    "config": "[[\"https://netto.dk\", \"https://salling.dk\", \"https://www.bilka.dk\", \"https://www.br.dk\", \"https://www.coolshop.dk\", \"https://www.foetex.dk\"], \"(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))\", \"poster|plakat|binder|mappe|album|sleeve|etui|toploader\", [\"200392806\"]]",
+    "config": "[[\"https://netto.dk\", \"https://salling.dk\", \"https://www.bilka.dk\", \"https://www.br.dk\", \"https://www.coolshop.dk\", \"https://www.foetex.dk\"], \"(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))\", \"poster|plakat|binder|mappe|album|sleeve|etui|toploader|sticker|klistermaerke|klistermærke|maerkat|mærkat\", [\"200392806\"]]",
     "known_products": {
       "200392214": {
         "first_seen": "2026-09-25T21:51:14.022351+02:00",
@@ -91,8 +91,8 @@
         ]
       }
     },
-    "last_run": "2026-09-29T09:10:27.467083+02:00",
-    "products_scanned": 323326
+    "last_run": "2026-09-29T20:38:40.771754+02:00",
+    "products_scanned": 322119
   },
   "watched_products": {
     "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/": {
