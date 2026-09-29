@@ -1,5 +1,5 @@
 {
-  "_heartbeat": "2026-09-28",
+  "_heartbeat": "2026-09-29",
   "etb30-bilka": {
     "method": "json-ld",
     "status": "out_of_stock",
@@ -103,8 +103,8 @@
         ]
       }
     },
-    "last_run": "2026-09-28T17:42:39.972528+02:00",
-    "products_scanned": 323591
+    "last_run": "2026-09-29T09:10:27.467083+02:00",
+    "products_scanned": 323326
   },
   "watched_products": {
     "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/": {
