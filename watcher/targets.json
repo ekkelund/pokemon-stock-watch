@@ -84,7 +84,7 @@
         "ignore_ids rammer enkeltvarer der er set og valgt fra:",
         "  200392806 = Sylveon ex Box 30th."
       ],
-      "exclude": "poster|plakat|binder|mappe|album|sleeve|etui|toploader",
+      "exclude": "poster|plakat|binder|mappe|album|sleeve|etui|toploader|sticker|klistermaerke|klistermærke|maerkat|mærkat",
       "ignore_ids": ["200392806"],
       "sites": [
         "https://www.bilka.dk",

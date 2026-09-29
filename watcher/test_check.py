@@ -346,8 +346,9 @@ class Test30thPattern(unittest.TestCase):
         ]:
             self.assertFalse(self.hit(slug), slug)
 
-    EXCLUDE = re.compile(r"poster|plakat|binder|mappe|album|sleeve|etui|toploader",
-                         re.IGNORECASE)
+    EXCLUDE = re.compile(
+        r"poster|plakat|binder|mappe|album|sleeve|etui|toploader"
+        r"|sticker|klistermaerke|klistermærke|maerkat|mærkat", re.IGNORECASE)
     IGNORE_IDS = {"200392806"}
 
     def wanted(self, slug, product_id=""):
@@ -357,10 +358,22 @@ class Test30thPattern(unittest.TestCase):
                 and product_id not in self.IGNORE_IDS)
 
     def test_merchandise_is_excluded(self):
-        # Rigtige 30th-varer, men plakater og mapper er ikke det vi jagter.
-        self.assertTrue(self.MATCH.search("pokemon poster collection 30th"))
-        self.assertFalse(self.wanted("pokemon-poster-collection-30th", "200392205"))
-        self.assertFalse(self.wanted("pokemon-binder-collection-30th", "200392204"))
+        # Rigtige 30th-varer, men plakater, mapper og klistermaerker er ikke
+        # det vi jagter.
+        for slug in ("pokemon-poster-collection-30th",
+                     "pokemon-binder-collection-30th",
+                     "pokemon-30th-celebration-tech-sticker-collection-pok10449-101"):
+            self.assertTrue(self.MATCH.search(slug.replace("-", " ")), slug)
+            self.assertFalse(self.wanted(slug), slug)
+
+    def test_card_products_survive_the_merchandise_filter(self):
+        # De fire Coolshop-varer vi beholder. Ingen af dem maa rammes af
+        # exclude, selv om de deler ord med merchandisen.
+        for slug in ("pokemon-30th-celebration-elite-trainer-box-pok10447-101",
+                     "pokemon-30th-celebration-ex-box-pok10463-101",
+                     "pokemon-30th-celebration-2-pack-blister-pok10666-102",
+                     "pokemon-30th-celebrations-tin-box-pok10466-101"):
+            self.assertTrue(self.wanted(slug), slug)
 
     def test_single_product_can_be_ignored_by_id(self):
         # Sylveon-boksen er hverken merchandise eller forkert navngivet; den er

@@ -40,11 +40,6 @@
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/"
   },
-  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-tech-sticker-collection-pok10449-101/23Y9WU/": {
-    "method": "text",
-    "status": "out_of_stock",
-    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-tech-sticker-collection-pok10449-101/23Y9WU/"
-  },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
     "method": "text",
     "status": "out_of_stock",
@@ -72,13 +67,6 @@
         "name": "Pokemon 30th Celebration Elite Trainer Box pok10447 101",
         "urls": [
           "https://www.coolshop.dk/produkt/pokemon-30th-celebration-elite-trainer-box-pok10447-101/23Y9WQ/"
-        ]
-      },
-      "23Y9WU": {
-        "first_seen": "2026-09-26T22:43:37.343560+02:00",
-        "name": "Pokemon 30th Celebration Tech Sticker Collection pok10449 101",
-        "urls": [
-          "https://www.coolshop.dk/produkt/pokemon-30th-celebration-tech-sticker-collection-pok10449-101/23Y9WU/"
         ]
       },
       "23Y9WZ": {
@@ -126,10 +114,6 @@
     "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/": {
       "name": "Pokemon 30th Celebration Ex Box pok10463 101 (Coolshop)",
       "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/"
-    },
-    "https://www.coolshop.dk/produkt/pokemon-30th-celebration-tech-sticker-collection-pok10449-101/23Y9WU/": {
-      "name": "Pokemon 30th Celebration Tech Sticker Collection pok10449 101 (Coolshop)",
-      "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-tech-sticker-collection-pok10449-101/23Y9WU/"
     },
     "https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
       "name": "Pokemon 30th Celebrations Tin Box pok10466 101 (Coolshop)",
