@@ -736,9 +736,16 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
         [sorted(target["sites"]), target["match"], target.get("exclude"),
          sorted(target.get("ignore_ids", []))],
         ensure_ascii=False, sort_keys=True)
+    # Er moensteret aendret, er de "nye" traef ikke nye varer: de har ligget
+    # der hele tiden og matchede bare ikke foer. De registreres derfor uden
+    # notifikation. Ellers ville hver justering af moensteret give en byge af
+    # beskeder om varer der ikke er sket noget med, og den slags stoej er
+    # praecis det der faar en til at holde op med at reagere paa beskederne.
+    seeding = False
     if entry.get("config") != fingerprint:
         if entry.get("config") is not None:
             print("  opsætningen er ændret, grænsen springes over")
+            seeding = True
         entry["config"] = fingerprint
         entry.pop("last_run", None)
 
@@ -812,6 +819,9 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
             urllib.parse.urlparse(u).netloc.replace("www.", "") for u in urls))
         known[product_id] = {"first_seen": now.isoformat(), "name": label,
                              "urls": sorted(urls)}
+        if seeding:
+            print(f"  registreret uden besked: {label} ({shops})")
+            continue
         print(f"  NY: {label} ({shops})")
         notify(
             f"{name.upper()} FUNDET: {label}",
