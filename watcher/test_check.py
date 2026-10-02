@@ -332,17 +332,28 @@ class TestMatchPattern(unittest.TestCase):
         text = slug.replace("-", " ")
         return bool(self.MATCH.search(text)) and not self.EXCLUDE.search(text)
 
-    def test_booster_i_enhver_form(self):
-        # Det der blev misset. Alle former skal fanges, ikke kun bundles.
+    def test_booster_bundles_uanset_saet(self):
+        # Det der blev misset 2. oktober. Pitch Black er ikke 30th, men
+        # bundle-formen er den der droppes og rives vaek, saa den skal med.
         for slug in [
-            "pokemon-booster-bundle-mega-evolution",
+            "pokemon-pitch-black-booster-bundle-samlekort",
             "pokemon-30th-celebration-booster-bundle",
-            "pokemon-pitch-black-checklane-booster-pack",
-            "pokemon-tcg-booster-pack-samlekort",
-            "pokemon-scarlet-violet-booster-box",
-            "pokemon-booster-pakke",
+            "pokemon-booster-bundle-mega-evolution",
         ]:
             self.assertTrue(self.hit(slug), slug)
+
+    def test_loese_packs_og_gamle_saet_ignoreres(self):
+        # Vaerdien ligger i 30th og i bundles. Loese packs og udgaaede saet
+        # ville kun stoeje: ni af dem laa hos Coolshop som permanent udsolgte.
+        for slug in [
+            "pokemon-pitch-black-checklane-booster-pack",
+            "pokemon-tcg-booster-pack-samlekort",
+            "pokemon-mega-evolution-me05-pitch-black-booster-box",
+            "pokemon-sun-and-moon-guardians-rising-trading-cards-full-booster-box-36-packs",
+            "pokemon-trading-card-game-steam-siege-booster-pack-10-packs",
+            "pokemon-fates-collide-booster-packet-card-game-10-packs",
+        ]:
+            self.assertFalse(self.hit(slug), slug)
 
     def test_30th_varerne(self):
         for slug in [

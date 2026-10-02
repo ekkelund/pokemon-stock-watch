@@ -77,7 +77,7 @@
         "Omvendt ville et bart pokemon-moenster fange hvert eneste loese",
         "  boosterbrev og hver t-shirt. Begge led skal vaere der."
       ],
-      "match": "(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))|(?=.*pokemon)(?=.*booster)|booster.{0,15}bundle",
+      "match": "(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))|(?=.*pokemon)(?=.*booster)(?=.*bundle)",
       "_om_fravalg": [
         "exclude rammer varetyper der aldrig oenskes, ogsaa dem der foerst",
         "  dukker op senere: plakater, mapper, album og lignende merchandise.",
