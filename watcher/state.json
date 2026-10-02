@@ -25,6 +25,11 @@
     "status": "out_of_stock",
     "url": "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
+  "fundet:https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/"
+  },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
     "last_diagnostic": "2026-10-02T10:46:06.580820+02:00",
     "method": "text",
@@ -53,7 +58,7 @@
     "url": "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
   "pokemon-30th": {
-    "config": "[[\"https://netto.dk\", \"https://salling.dk\", \"https://www.bilka.dk\", \"https://www.br.dk\", \"https://www.coolshop.dk\", \"https://www.foetex.dk\"], \"(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))|(?=.*pokemon)(?=.*booster)(?=.*bundle)\", \"poster|plakat|binder|mappe|album|sleeve|etui|toploader|sticker|klistermaerke|klistermærke|maerkat|mærkat|akrylkasse|opbevaring|madkasse|drikkedunk|headphone|hoeretelefon|høretelefon|instax|t-shirt|shorts\", [\"200392806\"]]",
+    "config": "[[\"https://netto.dk\", \"https://salling.dk\", \"https://www.bilka.dk\", \"https://www.br.dk\", \"https://www.coolshop.dk\", \"https://www.foetex.dk\"], \"(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))\", \"poster|plakat|binder|mappe|album|sleeve|etui|toploader|sticker|klistermaerke|klistermærke|maerkat|mærkat|akrylkasse|opbevaring|madkasse|drikkedunk|headphone|hoeretelefon|høretelefon|instax|t-shirt|shorts\", [\"200392806\"]]",
     "known_products": {
       "200380908": {
         "first_seen": "2026-10-02T17:19:52.873808+02:00",
@@ -100,7 +105,7 @@
         ]
       }
     },
-    "last_run": "2026-10-02T17:19:52.873808+02:00",
+    "last_run": "2026-10-02T17:21:16.265710+02:00",
     "products_scanned": 324582
   },
   "watched_products": {
