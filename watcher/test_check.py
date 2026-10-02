@@ -332,25 +332,32 @@ class TestMatchPattern(unittest.TestCase):
         text = slug.replace("-", " ")
         return bool(self.MATCH.search(text)) and not self.EXCLUDE.search(text)
 
-    def test_booster_bundles_uanset_saet(self):
-        # Det der blev misset 2. oktober. Pitch Black er ikke 30th, men
-        # bundle-formen er den der droppes og rives vaek, saa den skal med.
+    def test_30th_boostere_er_daekket(self):
+        """Det krav der forsvandt lydloest 25. september og kostede et drop.
+
+        Jagten er rent 30th, men en 30th-booster er en 30th-vare. Da
+        moensteret blev snaevret ind, blev disse ikke testet, og ingen
+        opdagede at de ikke laengere ville blive fanget. Det maa ikke
+        kunne ske igen uden at en test faelder.
+        """
         for slug in [
-            "pokemon-pitch-black-booster-bundle-samlekort",
             "pokemon-30th-celebration-booster-bundle",
-            "pokemon-booster-bundle-mega-evolution",
+            "pokemon-30th-booster-bundle-samlekort",
+            "pokemon-30th-celebration-booster-box",
+            "pokemon-booster-bundle-30th-anniversary",
         ]:
             self.assertTrue(self.hit(slug), slug)
 
-    def test_loese_packs_og_gamle_saet_ignoreres(self):
-        # Vaerdien ligger i 30th og i bundles. Loese packs og udgaaede saet
-        # ville kun stoeje: ni af dem laa hos Coolshop som permanent udsolgte.
+    def test_boostere_fra_andre_saet_ignoreres(self):
+        # Bevidst valg 2. oktober: vaerdien ligger i 30th. Pitch Black Booster
+        # Bundle hoerer hertil; den blev misset, men er ikke 30th. Til gengaeld
+        # holdes ni udgaaede Coolshop-saet ude som aldrig kommer paa lager igen.
         for slug in [
+            "pokemon-pitch-black-booster-bundle-samlekort",
             "pokemon-pitch-black-checklane-booster-pack",
             "pokemon-tcg-booster-pack-samlekort",
             "pokemon-mega-evolution-me05-pitch-black-booster-box",
             "pokemon-sun-and-moon-guardians-rising-trading-cards-full-booster-box-36-packs",
-            "pokemon-trading-card-game-steam-siege-booster-pack-10-packs",
             "pokemon-fates-collide-booster-packet-card-game-10-packs",
         ]:
             self.assertFalse(self.hit(slug), slug)
