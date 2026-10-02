@@ -6,14 +6,17 @@ logikken fast: at hver metode i kaskaden virker isoleret, at rækkefølgen er
 den tiltænkte, og at en uforståelig side giver "unknown" i stedet for at blive
 gættet til "udsolgt".
 """
+import json
 import re
 import sys
 import unittest
+from pathlib import Path
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from check import (  # noqa: E402
     IN_STOCK, OUT_OF_STOCK, UNKNOWN,
-    LOC_RE, PRODUCT_HREF_RE, detect_image, detect_status, is_product_url,
+    LOC_RE, PRODUCT_HREF_RE, detect_image, detect_price, detect_status,
+    is_product_url,
     looks_like_id, pretty_name, product_slug, shop_name, slot_is_active,
     visible_text,
 )
@@ -245,6 +248,161 @@ class TestDiscovery(unittest.TestCase):
         match = PRODUCT_HREF_RE.search(self.product_urls()[0])
         self.assertEqual(match.group(2), "200555666")
         self.assertEqual(match.group(1), "pokemon-booster-bundle-mega")
+
+
+class TestUrlShapes(unittest.TestCase):
+    """De fem sites deler ikke URL-form.
+
+    bilka/br/foetex: /produkter/<slug>/<tal>/
+    salling:         /<kategorier>/<slug>/p-<tal>/
+    netto:           ingen varer overhovedet
+    """
+
+    BILKA = "https://www.bilka.dk/produkter/pokemon-booster-bundle-mega/200555666/"
+    COOLSHOP = ("https://www.coolshop.dk/produkt/"
+                "pokemon-elite-trainer-box-30th/23456T/")
+    SALLING = ("https://salling.dk/boern/toej/t-shirts/"
+               "mile-pokemon-t-shirt-bright-white-116-cm/p-1180431/")
+    SALLING_BEAUTY = ("https://salling.dk/skoenhed/haar/haarpleje/"
+                      "booster-serum-100-ml/p-384325/")
+    NETTO = "https://netto.dk/butikker/netto-aarhus-c/"
+
+    def test_recognises_product_urls(self):
+        self.assertTrue(is_product_url(self.BILKA))
+        self.assertTrue(is_product_url(self.SALLING))
+        self.assertTrue(is_product_url(self.COOLSHOP))
+
+    def test_coolshop_ids_of_all_shapes(self):
+        # Coolshop-koder varierer i antal cifre. En regel der kraevede fire
+        # cifre afviste tre fjerdedele af deres katalog, og symptomet var en
+        # butik der saa tom ud.
+        for code in ["23456T", "23Y9X4", "23YB57", "23Z4A6", "9M9L6N", "2ABC3D"]:
+            self.assertTrue(looks_like_id(code), code)
+        self.assertTrue(looks_like_id("200392202"))
+        self.assertTrue(looks_like_id("p-1180431"))
+        self.assertEqual(product_slug(self.COOLSHOP),
+                         "pokemon-elite-trainer-box-30th")
+
+    def test_names_are_not_mistaken_for_ids(self):
+        # Slugs skrives med smaa bogstaver og bindestreger. Ingen af dem har
+        # baade ingen bindestreger og et stort bogstav eller lutter cifre.
+        for word in ["30th", "samlekort", "pokemon", "pl", "c", "produkter",
+                     "pokemon-30th-samlekort", "boern", "sylveon", "tin2"]:
+            self.assertFalse(looks_like_id(word), word)
+
+    def test_rejects_non_product_urls(self):
+        self.assertFalse(is_product_url(self.NETTO))
+        self.assertFalse(is_product_url("https://www.bilka.dk/c/legetoej/"))
+
+    def test_slug_excludes_category_path(self):
+        self.assertEqual(product_slug(self.BILKA), "pokemon-booster-bundle-mega")
+        self.assertEqual(product_slug(self.SALLING),
+                         "mile-pokemon-t-shirt-bright-white-116-cm")
+
+    def test_category_path_cannot_cause_false_match(self):
+        # Hele URL'en indeholder både "booster" og et kategoriord, men slug'en
+        # er det eneste der må tælle. Ellers ville hudpleje udløse alarmer.
+        pattern = re.compile("booster.{0,15}bundle", re.IGNORECASE)
+        self.assertIsNone(
+            pattern.search(product_slug(self.SALLING_BEAUTY).replace("-", " ")))
+
+    def test_bundle_in_slug_still_matches(self):
+        pattern = re.compile("booster.{0,15}bundle", re.IGNORECASE)
+        self.assertIsNotNone(
+            pattern.search(product_slug(self.BILKA).replace("-", " ")))
+
+
+class TestMatchPattern(unittest.TestCase):
+    """Mønsteret mod rigtige slugs fra katalogerne.
+
+    Mønsteret og frasorteringen læses fra targets.json, så testene ikke kan
+    komme til at afvige fra det der faktisk kører. Den slags afvigelse er
+    netop grunden til at en booster bundle slap forbi 2. oktober 2026:
+    da jagten blev snævret ind til 30th, forsvandt booster-daekningen
+    lydloest, og ingen test fangede det fordi ingen test kendte kravet.
+    """
+
+    _cfg = json.loads(
+        (Path(__file__).resolve().parent / "targets.json").read_text(encoding="utf-8")
+    )["discovery"][0]
+    MATCH = re.compile(_cfg["match"], re.IGNORECASE)
+    EXCLUDE = re.compile(_cfg["exclude"], re.IGNORECASE)
+
+    def hit(self, slug):
+        text = slug.replace("-", " ")
+        return bool(self.MATCH.search(text)) and not self.EXCLUDE.search(text)
+
+    def test_booster_i_enhver_form(self):
+        # Det der blev misset. Alle former skal fanges, ikke kun bundles.
+        for slug in [
+            "pokemon-booster-bundle-mega-evolution",
+            "pokemon-30th-celebration-booster-bundle",
+            "pokemon-pitch-black-checklane-booster-pack",
+            "pokemon-tcg-booster-pack-samlekort",
+            "pokemon-scarlet-violet-booster-box",
+            "pokemon-booster-pakke",
+        ]:
+            self.assertTrue(self.hit(slug), slug)
+
+    def test_30th_varerne(self):
+        for slug in [
+            "pokemon-elite-trainer-box-30th-samlekort",
+            "pokemon-30th-samlekort",
+            "pokemon-30th-celebration-elite-trainer-box-pok10447-101",
+            "pokemon-30th-celebration-ex-box-pok10463-101",
+            "pokemon-30th-celebration-2-pack-blister-pok10666-102",
+            "pokemon-30th-celebrations-tin-box-pok10466-101",
+        ]:
+            self.assertTrue(self.hit(slug), slug)
+
+    def test_andre_maerkers_boostere_ignoreres(self):
+        for slug in [
+            "topps-match-attax-champions-league-booster-tin-fodboldkort-assorteret",
+            "panini-hot-wheel-samlekort-booster-pakke",
+            "vm-booster-flowpack-samlekort",
+            "shieldbinder-akrylkasse-til-booster-box",
+        ]:
+            self.assertFalse(self.hit(slug), slug)
+
+    def test_merchandise_ignoreres(self):
+        # Rigtige Coolshop-varer. De hedder bundle, men er ikke kort.
+        for slug in [
+            "pokemon-madkasse-17x13-5-cm-drikkedunk-545-ml-bundle",
+            "pokemon-headphones-and-merchandise-bundle",
+            "pokemon-headphone-and-merchandise-pikachu-bundle",
+            "fuji-instax-mini-link-nintendo-pokemon-special-kit-instax-mini-film-20shots-bundle",
+            "pokemon-poster-collection-30th",
+            "pokemon-binder-collection-30th",
+            "pokemon-30th-celebration-tech-sticker-collection-pok10449-101",
+            "mile-pokemon-t-shirt-bright-white-116-cm",
+        ]:
+            self.assertFalse(self.hit(slug), slug)
+
+    def test_andre_jubilaeer_ignoreres(self):
+        for slug in [
+            "lego-ninjago-x-1-ninjabil-15-aars-jubilaeum-71867",
+            "original-tamagotchi-30-aars-jubilaeum",
+            "switch-rayman-30th-anniversary-edition",
+            "cd-kandis-35-aars-jubilaeumsalbum",
+            "paw-patrol-figurer-all-paws-celebration-gaveaeske",
+        ]:
+            self.assertFalse(self.hit(slug), slug)
+
+
+class TestPris(unittest.TestCase):
+    def test_pris_fra_schema_org(self):
+        html = page('<script type="application/ld+json">{"@type":"Product",'
+                    '"offers":{"price":349.95,"priceCurrency":"DKK"}}</script>')
+        self.assertEqual(detect_price(html), "349,95 kr.")
+
+    def test_laveste_variant_vises(self):
+        html = page('<script type="application/ld+json">{"@type":"Product",'
+                    '"offers":[{"price":99.0,"priceCurrency":"DKK"},'
+                    '{"price":74.97,"priceCurrency":"DKK"}]}</script>')
+        self.assertEqual(detect_price(html), "74,97 kr.")
+
+    def test_ingen_pris(self):
+        self.assertIsNone(detect_price(page("<p>ingen pris</p>")))
 
 
 class TestUrlShapes(unittest.TestCase):

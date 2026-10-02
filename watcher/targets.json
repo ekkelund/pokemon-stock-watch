@@ -77,14 +77,14 @@
         "Omvendt ville et bart pokemon-moenster fange hvert eneste loese",
         "  boosterbrev og hver t-shirt. Begge led skal vaere der."
       ],
-      "match": "(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))",
+      "match": "(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))|(?=.*pokemon)(?=.*booster)|booster.{0,15}bundle",
       "_om_fravalg": [
         "exclude rammer varetyper der aldrig oenskes, ogsaa dem der foerst",
         "  dukker op senere: plakater, mapper, album og lignende merchandise.",
         "ignore_ids rammer enkeltvarer der er set og valgt fra:",
         "  200392806 = Sylveon ex Box 30th."
       ],
-      "exclude": "poster|plakat|binder|mappe|album|sleeve|etui|toploader|sticker|klistermaerke|klistermærke|maerkat|mærkat",
+      "exclude": "poster|plakat|binder|mappe|album|sleeve|etui|toploader|sticker|klistermaerke|klistermærke|maerkat|mærkat|akrylkasse|opbevaring|madkasse|drikkedunk|headphone|hoeretelefon|høretelefon|instax|t-shirt|shorts",
       "ignore_ids": ["200392806"],
       "sites": [
         "https://www.bilka.dk",

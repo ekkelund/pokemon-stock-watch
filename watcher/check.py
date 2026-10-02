@@ -221,6 +221,32 @@ def _image_in_node(node):
     return None
 
 
+def detect_price(html: str):
+    """Pris fra schema.org offers. Returnerer fx "349,95 kr." eller None.
+
+    Står i notifikationen, så et drop kan vurderes uden at åbne linket. Ved
+    flere varianter tages den laveste: det er den man ser som "fra"-pris.
+    """
+    found = []
+    for entry in parse_ld_json(html):
+        amounts, currency = [], "DKK"
+        for _path, key, value in walk_json(entry):
+            if key.lower() == "price":
+                try:
+                    amounts.append(float(str(value).replace(",", ".")))
+                except (TypeError, ValueError):
+                    pass
+            elif key.lower() == "pricecurrency" and isinstance(value, str):
+                currency = value
+        if amounts:
+            found.append((min(amounts), currency))
+    if not found:
+        return None
+    amount, currency = min(found)
+    text = f"{amount:,.2f}".replace(",", " ").replace(".", ",")
+    return f"{text} {'kr.' if currency == 'DKK' else currency}"
+
+
 def detect_image(html: str, base_url: str):
     """Find produktets billede, så notifikationen viser den faktiske vare.
 
@@ -522,12 +548,13 @@ def check_product(target: dict, state: dict, now: datetime, dry_run: bool,
         return
 
     image = target.get("image") or detect_image(html, url) or fallback_image
+    price = detect_price(html)
     status, method, evidence = detect_status(html)
     previous = entry.get("status", UNKNOWN)
     entry["status"] = status
     entry["method"] = method
     entry["url"] = url
-    print(f"  status={status} (metode={method}) forrige={previous}")
+    print(f"  status={status} (metode={method}) forrige={previous} pris={price}")
     print(f"  belæg: {evidence[:200]}")
 
     if status == UNKNOWN:
@@ -547,7 +574,8 @@ def check_product(target: dict, state: dict, now: datetime, dry_run: bool,
             f"\n\n(Aflæst via mindre sikker metode: {method}. Tjek selv siden.)"
         notify(
             f"PÅ LAGER: {name}",
-            f"Varen er netop blevet tilgængelig.{confidence}\n\n{url}",
+            f"Varen er netop blevet tilgængelig"
+            f"{' til ' + price if price else ''}.{confidence}\n\n{url}",
             priority=5, tags=["package", "tada"], click=url, image=image,
             dry_run=dry_run,
         )
