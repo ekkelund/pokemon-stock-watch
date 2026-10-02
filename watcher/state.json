@@ -1,5 +1,5 @@
 {
-  "_heartbeat": "2026-10-01",
+  "_heartbeat": "2026-10-02",
   "etb30-bilka": {
     "method": "json-ld",
     "status": "out_of_stock",
@@ -26,7 +26,7 @@
     "url": "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
-    "last_diagnostic": "2026-10-01T15:40:03.005842+02:00",
+    "last_diagnostic": "2026-10-02T10:46:06.580820+02:00",
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/"
@@ -42,7 +42,7 @@
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
-    "last_diagnostic": "2026-10-01T15:40:03.005842+02:00",
+    "last_diagnostic": "2026-10-02T10:46:06.580820+02:00",
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/"
@@ -93,8 +93,8 @@
         ]
       }
     },
-    "last_run": "2026-10-01T15:40:03.005842+02:00",
-    "products_scanned": 321731
+    "last_run": "2026-10-02T10:46:06.580820+02:00",
+    "products_scanned": 323506
   },
   "watched_products": {
     "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/": {
