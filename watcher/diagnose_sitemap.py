@@ -11,7 +11,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check import (  # noqa: E402
-    http_get, is_product_url, looks_like_id, product_slug,
+    detect_price, detect_status, http_get, is_product_url, looks_like_id,
+    product_slug,
 )
 
 DEFAULT_SITES = ["https://www.bilka.dk", "https://www.br.dk", "https://www.foetex.dk"]
@@ -30,6 +31,27 @@ if "--match" in args:
     i = args.index("--match"); try_match = args[i + 1]; del args[i:i + 2]
 if "--exclude" in args:
     i = args.index("--exclude"); try_exclude = args[i + 1]; del args[i:i + 2]
+# Henter hver traeffers side og viser lagerstatus og pris. Kun til faa traef:
+# det er én hentning pr. vare.
+with_status = "--with-status" in args
+if with_status:
+    args.remove("--with-status")
+FUND = []
+
+def _afslut():
+    if not FUND:
+        return
+    print("=" * 78)
+    print("OPSUMMERING")
+    print("=" * 78)
+    for navn, status, pris, url in sorted(FUND, key=lambda r: (r[1] != "in_stock", r[0])):
+        maerke = ">>> PÅ LAGER" if status == "in_stock" else "    " + status
+        print(f"{maerke:<16} {pris:>12}   {navn}")
+        print(f"                              {url}")
+
+
+import atexit  # noqa: E402
+atexit.register(_afslut)
 
 for base in (args or DEFAULT_SITES):
     print("=" * 78)
@@ -128,6 +150,16 @@ for base in (args or DEFAULT_SITES):
         for u in kept:
             print(f"      BEHOLDT  {slug(u)}")
             print(f"               {u}")
+            if with_status:
+                html, err = http_get(u)
+                if html is None:
+                    FUND.append((slug(u), "FEJL " + str(err), "", u))
+                    print(f"               FEJL {err}")
+                else:
+                    st, me, _ = detect_status(html)
+                    pris = detect_price(html) or "ukendt"
+                    FUND.append((slug(u), st, pris, u))
+                    print(f"               {st} ({me}), pris {pris}")
         for u in dropped:
             print(f"      FRASORT. {slug(u)}")
     else:
