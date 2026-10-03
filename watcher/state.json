@@ -25,6 +25,16 @@
     "status": "out_of_stock",
     "url": "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
+  "fundet:https://www.br.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.br.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
+  },
+  "fundet:https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
+    "method": "json-ld",
+    "status": "in_stock",
+    "url": "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
+  },
   "fundet:https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/": {
     "method": "json-ld",
     "status": "out_of_stock",
@@ -56,6 +66,16 @@
     "method": "json-ld",
     "status": "out_of_stock",
     "url": "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/"
+  },
+  "fundet:https://www.foetex.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.foetex.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
+  },
+  "fundet:https://www.foetex.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
+    "method": "json-ld",
+    "status": "in_stock",
+    "url": "https://www.foetex.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
   },
   "pokemon-30th": {
     "config": "[[\"https://netto.dk\", \"https://salling.dk\", \"https://www.bilka.dk\", \"https://www.br.dk\", \"https://www.coolshop.dk\", \"https://www.foetex.dk\"], \"(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))\", \"poster|plakat|binder|mappe|album|sleeve|etui|toploader|sticker|klistermaerke|klistermærke|maerkat|mærkat|akrylkasse|opbevaring|madkasse|drikkedunk|headphone|hoeretelefon|høretelefon|instax|t-shirt|shorts\", [\"200392806\"]]",
