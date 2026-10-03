@@ -1,5 +1,5 @@
 {
-  "_heartbeat": "2026-10-02",
+  "_heartbeat": "2026-10-03",
   "etb30-bilka": {
     "method": "json-ld",
     "status": "out_of_stock",
@@ -31,7 +31,7 @@
     "url": "https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
-    "last_diagnostic": "2026-10-02T10:46:06.580820+02:00",
+    "last_diagnostic": "2026-10-03T11:19:40.563643+02:00",
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/"
@@ -47,7 +47,7 @@
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
-    "last_diagnostic": "2026-10-02T10:46:06.580820+02:00",
+    "last_diagnostic": "2026-10-03T11:19:40.563643+02:00",
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/"
@@ -74,6 +74,22 @@
           "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/",
           "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/",
           "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/"
+        ]
+      },
+      "200397756": {
+        "first_seen": "2026-10-03T11:19:40.563643+02:00",
+        "name": "Pokemon Mini Tins 30th Flere Varianter Assorteret",
+        "urls": [
+          "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/",
+          "https://www.foetex.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
+        ]
+      },
+      "200397758": {
+        "first_seen": "2026-10-03T11:19:40.563643+02:00",
+        "name": "Pokemon Booster Bundle 30th Celebration",
+        "urls": [
+          "https://www.br.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/",
+          "https://www.foetex.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
         ]
       },
       "23Y9WQ": {
@@ -105,8 +121,8 @@
         ]
       }
     },
-    "last_run": "2026-10-02T17:21:16.265710+02:00",
-    "products_scanned": 324582
+    "last_run": "2026-10-03T11:19:40.563643+02:00",
+    "products_scanned": 324197
   },
   "watched_products": {
     "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/": {
@@ -116,6 +132,14 @@
     "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/": {
       "name": "Pokemon 30th Samlekort (BR)",
       "url": "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/"
+    },
+    "https://www.br.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/": {
+      "name": "Pokemon Booster Bundle 30th Celebration (BR)",
+      "url": "https://www.br.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
+    },
+    "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
+      "name": "Pokemon Mini Tins 30th Flere Varianter Assorteret (BR)",
+      "url": "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
     },
     "https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/": {
       "name": "Pokemon Pitch Black Booster Bundle Samlekort (BR)",
@@ -140,6 +164,14 @@
     "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/": {
       "name": "Pokemon 30th Samlekort (føtex)",
       "url": "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/"
+    },
+    "https://www.foetex.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/": {
+      "name": "Pokemon Booster Bundle 30th Celebration (føtex)",
+      "url": "https://www.foetex.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
+    },
+    "https://www.foetex.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
+      "name": "Pokemon Mini Tins 30th Flere Varianter Assorteret (føtex)",
+      "url": "https://www.foetex.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
     }
   }
 }
