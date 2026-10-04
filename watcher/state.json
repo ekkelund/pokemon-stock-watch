@@ -20,6 +20,16 @@
     "status": "out_of_stock",
     "url": "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
+  "fundet:https://www.bilka.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.bilka.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
+  },
+  "fundet:https://www.bilka.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
+    "method": "json-ld",
+    "status": "out_of_stock",
+    "url": "https://www.bilka.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
+  },
   "fundet:https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/": {
     "method": "json-ld",
     "status": "out_of_stock",
