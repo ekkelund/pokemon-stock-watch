@@ -1,5 +1,5 @@
 {
-  "_heartbeat": "2026-10-04",
+  "_heartbeat": "2026-10-05",
   "etb30-bilka": {
     "method": "json-ld",
     "status": "out_of_stock",
@@ -51,7 +51,7 @@
     "url": "https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
-    "last_diagnostic": "2026-10-04T08:08:19.627851+02:00",
+    "last_diagnostic": "2026-10-05T04:12:47.919011+02:00",
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/"
@@ -67,7 +67,7 @@
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
-    "last_diagnostic": "2026-10-04T08:08:19.627851+02:00",
+    "last_diagnostic": "2026-10-05T04:12:47.919011+02:00",
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/"
