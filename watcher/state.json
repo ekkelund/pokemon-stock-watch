@@ -49,11 +49,6 @@
     "status": "unknown",
     "url": "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
   },
-  "fundet:https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/": {
-    "method": "json-ld",
-    "status": "out_of_stock",
-    "url": "https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/"
-  },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
     "last_diagnostic": "2026-10-07T11:38:56.532267+02:00",
     "method": "text",
@@ -96,13 +91,6 @@
   "pokemon-30th": {
     "config": "[[\"https://netto.dk\", \"https://salling.dk\", \"https://www.bilka.dk\", \"https://www.br.dk\", \"https://www.coolshop.dk\", \"https://www.foetex.dk\"], \"(?=.*pokemon)(?=.*(?:30th|30 aar|30 ars|celebration))\", \"poster|plakat|binder|mappe|album|sleeve|etui|toploader|sticker|klistermaerke|klistermærke|maerkat|mærkat|akrylkasse|opbevaring|madkasse|drikkedunk|headphone|hoeretelefon|høretelefon|instax|t-shirt|shorts\", [\"200392806\"]]",
     "known_products": {
-      "200380908": {
-        "first_seen": "2026-10-02T17:19:52.873808+02:00",
-        "name": "Pokemon Pitch Black Booster Bundle Samlekort",
-        "urls": [
-          "https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/"
-        ]
-      },
       "200392214": {
         "first_seen": "2026-09-25T21:51:14.022351+02:00",
         "name": "Pokemon 30th Samlekort",
@@ -184,10 +172,6 @@
     "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
       "name": "Pokemon Mini Tins 30th Flere Varianter Assorteret (BR)",
       "url": "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
-    },
-    "https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/": {
-      "name": "Pokemon Pitch Black Booster Bundle Samlekort (BR)",
-      "url": "https://www.br.dk/produkter/pokemon-pitch-black-booster-bundle-samlekort/200380908/"
     },
     "https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
       "name": "Pokemon 30th Celebration 2 Pack Blister pok10666 102 (Coolshop)",

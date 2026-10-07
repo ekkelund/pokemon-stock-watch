@@ -407,6 +407,85 @@ class TestMatchPattern(unittest.TestCase):
             self.assertFalse(self.hit(slug), slug)
 
 
+class TestOvergangFraUkendt(unittest.TestCase):
+    """Den vigtigste overgang af alle: ukendt -> paa lager.
+
+    Booster Bundle 30th Celebration stod 7. oktober som unknown, fordi varens
+    side endnu ikke var gaaet i luften: BR serverede forsiden i stedet. Naar
+    siden kommer op, skal springet fra unknown til in_stock udloese en besked.
+    Sker det ikke, er overvaagningen ubrugelig netop paa de varer der er paa
+    vej, og det er dem det hele handler om.
+    """
+
+    PAA_LAGER = page('''<script type="application/ld+json">{"@type":"Product",
+        "name":"Pokemon Booster Bundle 30th Celebration",
+        "offers":{"availability":"https://schema.org/InStock",
+                  "price":299,"priceCurrency":"DKK"}}</script>''')
+
+    def _koer(self, forrige_status):
+        import check
+        beskeder = []
+        aegte = check.http_get
+        check.http_get = lambda url, **kw: (self.PAA_LAGER, None)
+        aegte_notify = check.notify
+        check.notify = lambda titel, tekst, **kw: beskeder.append((titel, tekst))
+        try:
+            state = {"x": {"status": forrige_status}} if forrige_status else {}
+            check.check_product(
+                {"key": "x", "name": "Booster Bundle 30th (BR)",
+                 "url": "https://www.br.dk/produkter/x/200397758/"},
+                state, datetime(2026, 10, 7, 12, 0), dry_run=True)
+        finally:
+            check.http_get, check.notify = aegte, aegte_notify
+        return beskeder, state
+
+    def test_ukendt_til_paa_lager_giver_besked(self):
+        beskeder, state = self._koer("unknown")
+        self.assertEqual(len(beskeder), 1, "ingen besked ved ukendt -> paa lager")
+        self.assertIn("PÅ LAGER", beskeder[0][0])
+        self.assertIn("299", beskeder[0][1])
+        self.assertEqual(state["x"]["status"], IN_STOCK)
+
+    def test_udsolgt_til_paa_lager_giver_besked(self):
+        beskeder, _ = self._koer("out_of_stock")
+        self.assertEqual(len(beskeder), 1)
+
+    def test_foerste_gang_giver_besked(self):
+        beskeder, _ = self._koer(None)
+        self.assertEqual(len(beskeder), 1)
+
+    def test_paa_lager_til_paa_lager_tier(self):
+        beskeder, _ = self._koer("in_stock")
+        self.assertEqual(beskeder, [], "gentagen besked for uaendret status")
+
+
+class TestOprydning(unittest.TestCase):
+    """Overvaagningslisten skal foelge konfigurationen begge veje.
+
+    Listen voksede foer kun. Strammede man moensteret, blev gamle varer
+    liggende, og konfigurationen sagde én ting mens noget andet blev tjekket.
+    Pitch Black Booster Bundle hang saadan i listen efter 2. oktober.
+    """
+
+    MATCH = re.compile(r"(?=.*pokemon)(?=.*(?:30th|celebration))", re.IGNORECASE)
+
+    def passer(self, url):
+        return bool(self.MATCH.search(product_slug(url).replace("-", " ")))
+
+    def test_vare_der_ikke_laengere_matcher_ryddes(self):
+        url = ("https://www.br.dk/produkter/"
+               "pokemon-pitch-black-booster-bundle-samlekort/200380908/")
+        self.assertFalse(self.passer(url))
+
+    def test_30th_varer_bliver_liggende(self):
+        for url in [
+            "https://www.bilka.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/",
+            "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/",
+            "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/",
+        ]:
+            self.assertTrue(self.passer(url), url)
+
+
 class TestPris(unittest.TestCase):
     def test_pris_fra_schema_org(self):
         html = page('<script type="application/ld+json">{"@type":"Product",'

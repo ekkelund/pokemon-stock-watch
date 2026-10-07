@@ -832,6 +832,26 @@ def check_discovery(target: dict, state: dict, now: datetime, dry_run: bool,
             image=target.get("image") or fallback_image, dry_run=dry_run,
         )
 
+    # Ryd varer ud der ikke laengere matcher. Listen voksede foer kun, saa en
+    # stramning af moensteret efterlod gamle varer tilbage og konfigurationen
+    # stemte ikke med det der faktisk blev tjekket. Det misforhold er svaert at
+    # opdage og nemt at tage fejl af.
+    for url in sorted(watched):
+        label = product_slug(url).replace("-", " ")
+        passer = (pattern.search(label)
+                  and not (exclude and exclude.search(label))
+                  and url_segments(url)[-1] not in ignore_ids)
+        if passer:
+            continue
+        watched.pop(url)
+        state.pop(f"fundet:{url}", None)
+        print(f"  fjernet, matcher ikke laengere: {product_slug(url)}")
+        for pid, info in list(known.items()):
+            if url in info.get("urls", []):
+                info["urls"] = [u for u in info["urls"] if u != url]
+                if not info["urls"]:
+                    known.pop(pid)
+
     entry["last_run"] = now.isoformat()
     entry["products_scanned"] = total
     print(f"  {len(known)} kendte varer, {total} produkter gennemgået")
