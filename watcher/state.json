@@ -55,6 +55,11 @@
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/"
   },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-booster-pack-bundle-pok10451-101/23Z4NE/": {
+    "method": "text",
+    "status": "out_of_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-booster-pack-bundle-pok10451-101/23Z4NE/"
+  },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-elite-trainer-box-pok10447-101/23Y9WQ/": {
     "method": "text",
     "status": "out_of_stock",
@@ -64,6 +69,11 @@
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/"
+  },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-mini-tin-pok10465-101/23Z4NH/": {
+    "method": "json-ld",
+    "status": "in_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-mini-tin-pok10465-101/23Z4NH/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
     "last_diagnostic": "2026-10-09T10:18:50.417604+02:00",
