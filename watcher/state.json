@@ -49,6 +49,16 @@
     "status": "unknown",
     "url": "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
   },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-anniversary-plush-20-cm-select-pastel-espeon-pkw4913/23WZ8T/": {
+    "method": "json-ld",
+    "status": "in_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-anniversary-plush-20-cm-select-pastel-espeon-pkw4913/23WZ8T/"
+  },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-anniversary-plush-20-cm-select-pastel-pikachu-pkw4912/23WZ8S/": {
+    "method": "json-ld",
+    "status": "in_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-anniversary-plush-20-cm-select-pastel-pikachu-pkw4912/23WZ8S/"
+  },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
     "last_diagnostic": "2026-10-10T14:49:13.775747+02:00",
     "method": "text",
