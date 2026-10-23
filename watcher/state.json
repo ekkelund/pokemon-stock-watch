@@ -90,6 +90,11 @@
     "status": "in_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-mini-tin-pok10465-101/23Z4NH/"
   },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-ultra-premium-collection-pok10448-101/23Z4NS/": {
+    "method": "text",
+    "status": "out_of_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ultra-premium-collection-pok10448-101/23Z4NS/"
+  },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
     "last_diagnostic": "2026-10-23T10:13:32.280158+02:00",
     "method": "text",
