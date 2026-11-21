@@ -1,55 +1,55 @@
 {
-  "_heartbeat": "2026-11-20",
+  "_heartbeat": "2026-11-21",
   "etb30-bilka": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.bilka.dk/produkter/pokemon-elite-trainer-box-30th-samlekort/200392202/"
   },
   "etb30-br": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.br.dk/produkter/pokemon-elite-trainer-box-30th-samlekort/200392202/"
   },
   "etb30-foetex": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.foetex.dk/produkter/pokemon-elite-trainer-box-30th-samlekort/200392202/"
   },
   "fundet:https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
   "fundet:https://www.bilka.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.bilka.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
   },
   "fundet:https://www.bilka.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.bilka.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
   },
   "fundet:https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.br.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
   "fundet:https://www.br.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.br.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
   },
   "fundet:https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.br.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
@@ -65,7 +65,7 @@
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-anniversary-plush-20-cm-select-pastel-pikachu-pkw4912/23WZ8S/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-2-pack-blister-pok10666-102/23Y9X4/"
@@ -96,25 +96,25 @@
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ultra-premium-collection-pok10448-101/23Z4NS/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "text",
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebrations-tin-box-pok10466-101/23Y9X5/"
   },
   "fundet:https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.foetex.dk/produkter/pokemon-30th-samlekort/200392214/"
   },
   "fundet:https://www.foetex.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.foetex.dk/produkter/pokemon-booster-bundle-30th-celebration/200397758/"
   },
   "fundet:https://www.foetex.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/": {
-    "last_diagnostic": "2026-11-20T13:24:38.420255+01:00",
+    "last_diagnostic": "2026-11-21T10:03:50.529825+01:00",
     "method": "none",
     "status": "unknown",
     "url": "https://www.foetex.dk/produkter/pokemon-mini-tins-30th-flere-varianter-assorteret/200397756/"
@@ -203,17 +203,38 @@
           "https://www.coolshop.dk/produkt/pokemon-30th-celebration-mini-tin-pok10465-101/23Z4NH/"
         ]
       },
+      "23Z4NP": {
+        "first_seen": "2026-11-21T10:03:50.529825+01:00",
+        "name": "Pokemon 30th Celebration Figure Collection pok10452 101",
+        "urls": [
+          "https://www.coolshop.dk/produkt/pokemon-30th-celebration-figure-collection-pok10452-101/23Z4NP/"
+        ]
+      },
       "23Z4NS": {
         "first_seen": "2026-10-23T10:13:32.280158+02:00",
         "name": "Pokemon 30th Celebration Ultra Premium Collection pok10448 101",
         "urls": [
           "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ultra-premium-collection-pok10448-101/23Z4NS/"
         ]
+      },
+      "23Z8YH": {
+        "first_seen": "2026-11-21T10:03:50.529825+01:00",
+        "name": "Pokemon 30th Celebration Ex Box Sylveon Ex Collection pok10463 108",
+        "urls": [
+          "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-sylveon-ex-collection-pok10463-108/23Z8YH/"
+        ]
+      },
+      "23Z8YJ": {
+        "first_seen": "2026-11-21T10:03:50.529825+01:00",
+        "name": "Pokemon 30th Celebration Ex Box Greninja Ex Collection pok10463 114",
+        "urls": [
+          "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-greninja-ex-collection-pok10463-114/23Z8YJ/"
+        ]
       }
     },
     "last_diagnostic": "2026-10-16T02:00:15.319578+02:00",
-    "last_run": "2026-11-20T13:24:38.420255+01:00",
-    "products_scanned": 334433
+    "last_run": "2026-11-21T10:03:50.529825+01:00",
+    "products_scanned": 334212
   },
   "watched_products": {
     "https://www.bilka.dk/produkter/pokemon-30th-samlekort/200392214/": {
@@ -260,9 +281,21 @@
       "name": "Pokemon 30th Celebration Elite Trainer Box pok10447 101 (Coolshop)",
       "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-elite-trainer-box-pok10447-101/23Y9WQ/"
     },
+    "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-greninja-ex-collection-pok10463-114/23Z8YJ/": {
+      "name": "Pokemon 30th Celebration Ex Box Greninja Ex Collection pok10463 114 (Coolshop)",
+      "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-greninja-ex-collection-pok10463-114/23Z8YJ/"
+    },
     "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/": {
       "name": "Pokemon 30th Celebration Ex Box pok10463 101 (Coolshop)",
       "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/"
+    },
+    "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-sylveon-ex-collection-pok10463-108/23Z8YH/": {
+      "name": "Pokemon 30th Celebration Ex Box Sylveon Ex Collection pok10463 108 (Coolshop)",
+      "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-sylveon-ex-collection-pok10463-108/23Z8YH/"
+    },
+    "https://www.coolshop.dk/produkt/pokemon-30th-celebration-figure-collection-pok10452-101/23Z4NP/": {
+      "name": "Pokemon 30th Celebration Figure Collection pok10452 101 (Coolshop)",
+      "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-figure-collection-pok10452-101/23Z4NP/"
     },
     "https://www.coolshop.dk/produkt/pokemon-30th-celebration-mini-tin-pok10465-101/23Z4NH/": {
       "name": "Pokemon 30th Celebration Mini Tin pok10465 101 (Coolshop)",
