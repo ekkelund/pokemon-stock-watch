@@ -80,10 +80,25 @@
     "status": "out_of_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-elite-trainer-box-pok10447-101/23Y9WQ/"
   },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-greninja-ex-collection-pok10463-114/23Z8YJ/": {
+    "method": "json-ld",
+    "status": "in_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-greninja-ex-collection-pok10463-114/23Z8YJ/"
+  },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/": {
     "method": "json-ld",
     "status": "in_stock",
     "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-pok10463-101/23Y9WZ/"
+  },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-sylveon-ex-collection-pok10463-108/23Z8YH/": {
+    "method": "json-ld",
+    "status": "in_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-ex-box-sylveon-ex-collection-pok10463-108/23Z8YH/"
+  },
+  "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-figure-collection-pok10452-101/23Z4NP/": {
+    "method": "json-ld",
+    "status": "in_stock",
+    "url": "https://www.coolshop.dk/produkt/pokemon-30th-celebration-figure-collection-pok10452-101/23Z4NP/"
   },
   "fundet:https://www.coolshop.dk/produkt/pokemon-30th-celebration-mini-tin-pok10465-101/23Z4NH/": {
     "method": "json-ld",
